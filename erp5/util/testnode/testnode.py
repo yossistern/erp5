@@ -24,116 +24,23 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 ##############################################################################
-from datetime import datetime
 import os
-import signal
-import socket
 import subprocess
 import sys
 import time
 import xmlrpclib
 import glob
-import SlapOSControler
+from erp5.util.slapos import SlapOSControler
 import threading
 
-from ProcessManager import SubprocessError, ProcessManager, CancellationError
-from Updater import Updater
+from erp5.util.process import SubprocessError, ProcessManager, CancellationError
+from erp5.util.taskdistribution import TaskDistributionClient, safeRpcCall
+from erp5.util.taskdistribution.RemoteLogger import RemoteLogger
+from erp5.util.vcs import Updater
 
 DEFAULT_SLEEP_TIMEOUT = 120 # time in seconds to sleep
 
 supervisord_pid_file = None
-
-def safeRpcCall(log, proxy, function_id, retry, *args):
-  # this method will try infinitive calls to backend
-  # this can cause testnode to looked "stalled"
-  retry_time = 64
-  while True:
-    try:
-      # it safer to pass proxy and function_id so we avoid httplib.ResponseNotReady
-      # by trying reconnect before server keep-alive ends and the socket closes
-      log('safeRpcCall called with method : %s' % function_id)
-      function = getattr(proxy, function_id)
-      return function(*args)
-    except (socket.error, xmlrpclib.ProtocolError, xmlrpclib.Fault), e:
-      log('Exception in safeRpcCall when trying %s with %r' % (function_id, args),
-           exc_info=sys.exc_info())
-      if not(retry):
-        return
-      log('will retry safeRpcCall in %i seconds' % retry_time)
-      time.sleep(retry_time)
-      retry_time += retry_time >> 1
-
-class RemoteLogger(object):
-
-  def __init__(self, log, log_file, test_node_title, process_manager):
-    self.portal = None
-    self.test_result_path = None
-    self.test_node_title = test_node_title
-    self.log = log
-    self.log_file = log_file
-    self.process_manager = process_manager
-    self.finish = False
-    self.quit = False
-
-  def update(self, portal, test_result_path):
-    self.portal = portal
-    self.test_result_path = test_result_path
-
-  def getSize(self):
-    erp5testnode_log = open(self.log_file, 'r')
-    erp5testnode_log.seek(0, 2)
-    size = erp5testnode_log.tell()
-    erp5testnode_log.close()
-    return size
-
-  def __call__(self):
-    size = self.getSize()
-    while True:
-      for x in xrange(0,60):
-        if self.quit or self.finish:
-          break
-        time.sleep(1)
-      if self.quit:
-        return
-      finish = retry = self.finish
-      if self.test_result_path is None:
-        if finish:
-          return
-        continue
-      start_size = size
-      end_size = self.getSize()
-      # file was truncated
-      if end_size < start_size:
-        size = end_size
-        continue
-      # display some previous data
-      if start_size >= 5000:
-        start_size -= 5000
-      # do not send tons of log, only last logs
-      if (end_size-start_size >= 10000):
-        start_size = end_size-10000
-      erp5testnode_log = open(self.log_file, 'r')
-      erp5testnode_log.seek(start_size)
-      output = erp5testnode_log.read()
-      erp5testnode_log.close()
-      if end_size == size:
-        output += '%s : stucked ??' % datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-      # check if the test result is still alive
-      is_alive = safeRpcCall(self.log, self.portal, "isTaskAlive", False,
-          self.test_result_path)
-      self.log('isTaskAlive result %r' % is_alive)
-      if is_alive is not None  and is_alive == 0:
-        self.log('Test Result cancelled on server side, stop current test')
-        self.process_manager.killPreviousRun(cancellation=True)
-        return
-      status_dict = dict(command='erp5testnode', status_code=0,
-                         stdout=''.join(output), stderr='')
-      safeRpcCall(self.log, self.portal, "reportTaskStatus", retry,
-          self.test_result_path, status_dict, self.test_node_title)
-      size = end_size
-      if finish:
-        return
-
 PROFILE_PATH_KEY = 'profile_path'
 
 
