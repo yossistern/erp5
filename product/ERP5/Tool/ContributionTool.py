@@ -229,6 +229,7 @@ class ContributionTool(BaseTool):
                                 user_login=user_login,
                                 input_parameter_dict=input_parameter_dict)
       if REQUEST is not None:
+        REQUEST.RESPONSE.setHeader('X-Document-Location', document.absolute_url())
         return REQUEST.RESPONSE.redirect(self.absolute_url())
       return document
 
