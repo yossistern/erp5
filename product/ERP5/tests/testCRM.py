@@ -1609,6 +1609,7 @@ class TestCRMMailSend(BaseTestCRM):
       self.assertEquals(event.getSourceSection(), user.getSubordination())
     finally:
       # clean up created roles on portal_types
+      self.login() # admin
       for portal_type in portal_type_list:
         portal_type_object = getattr(self.portal.portal_types, portal_type)
         portal_type_object._delObject('manager_role')
@@ -1634,6 +1635,8 @@ class TestCRMMailSend(BaseTestCRM):
     mail_message.Event_send(packet_size=2)
     self.commit()
     portal_activities = self.portal.portal_activities
+    portal_activities.manageInvoke(object_path=mail_message.getPath(), method_id='Event_sendByActivity')
+    self.commit()
     message_list = [i for i in portal_activities.getMessageList() \
                     if i.kw.has_key("event_relative_url")]
     try:

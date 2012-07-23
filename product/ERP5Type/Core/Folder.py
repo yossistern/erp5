@@ -70,8 +70,6 @@ except ImportError:
     pass
 
 
-from AccessControl import getSecurityManager
-from Products.ERP5Type import Permissions
 from DateTime import DateTime
 from random import randint
 
@@ -186,7 +184,7 @@ class FolderMixIn(ExtensionClass.Base):
     Generate id base on date, useful for HBTreeFolder
     We also append random id
     """
-    current_date = str(DateTime().Date()).replace("/", "")
+    current_date = DateTime().strftime('%Y%m%d')
     my_id = self._generateRandomId()
     return "%s-%s" %(current_date, my_id)
     
@@ -214,6 +212,22 @@ class FolderMixIn(ExtensionClass.Base):
     my_id = str(my_id)
     self._setLastId(my_id) # Make sure no reindexing happens
     return my_id
+
+  def _generatePerNodeNumberId(self):
+    """
+    Generate id base on node number, useful for import and mass creation
+    of objects inside a module using activities
+    We also append random id
+    """
+    activity_tool = self.getPortalObject().portal_activities
+    node_list = list(activity_tool.getNodeList())
+    current_node = activity_tool.getCurrentNode()
+    try:
+      node_number = node_list.index(current_node)
+    except ValueError:
+      # Not a processing node
+      node_number = 111
+    return "%03d-%s" %(node_number, self._generateRandomId())
 
   # Automatic ID Generation method
   security.declareProtected(Permissions.View, 'generateNewId')
@@ -1200,7 +1214,6 @@ class Folder(CopyContainer, CMFBTreeFolder, CMFHBTreeFolder, Base, FolderMixIn):
     if isinstance(to_class, type('')):
       to_class = getClassFromString(to_class)
 
-    folder = self.getObject()
     for o in self.listFolderContents():
       # Make sure this sub object is not the same as object
       if o.getPhysicalPath() != self.getPhysicalPath():
@@ -1256,10 +1269,11 @@ class Folder(CopyContainer, CMFBTreeFolder, CMFHBTreeFolder, Base, FolderMixIn):
   def reindexObjectSecurity(self, *args, **kw):
     """
         Reindex security-related indexes on the object
-        (and its descendants).
     """
-    # In ERP5, simply reindex all objects.
-    self.recursiveReindexObject(*args, **kw)
+    # In ERP5, simply reindex all objects, recursively by default.
+    reindex = self._getTypeBasedMethod('reindexObjectSecurity',
+                                       'recursiveReindexObject')
+    reindex(*args, **kw)
 
   security.declarePublic( 'recursiveReindexObject' )
   def recursiveReindexObject(self, activate_kw=None, **kw):
@@ -1485,7 +1499,6 @@ class Folder(CopyContainer, CMFBTreeFolder, CMFHBTreeFolder, Base, FolderMixIn):
     corrected_list = []
     for object in from_object_related_object_list:
       #LOG('Folder.mergeContent, working on object:',0,object)
-      object_url = object.getRelativeUrl()
       new_category_list = []
       found = 0
       for category in object.getCategoryList(): # so ('destination/person/1',...)
