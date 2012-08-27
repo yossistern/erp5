@@ -186,7 +186,10 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>shopping_cart = context.SaleOrder_getShoppingCart()\n
+            <value> <string>"""\n
+  Return selected shipping method from shopping cart\n
+"""\n
+shopping_cart = context.SaleOrder_getShoppingCart()\n
 shipping_method = getattr(shopping_cart, \'shipping_method\', None)\n
 if shipping_method is not None:\n
   return shipping_method.getResourceValue()\n

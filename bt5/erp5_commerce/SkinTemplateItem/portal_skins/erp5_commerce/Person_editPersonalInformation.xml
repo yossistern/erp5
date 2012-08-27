@@ -50,13 +50,24 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string># Only save basic personal information for an ecommerce website\n
+            <value> <string>"""\n
+  Edit the personal information of a client through specific form\n
+  which takes into account only  basic personal information \n
+\n
+  TODO:\n
+  - handle form validation errors after the call to\n
+    Base_edit (not the case currently)\n
+\n
+  BUG:\n
+  - make sure personal address can be updated from\n
+    account page (no the case currently)\n
+"""\n
 translateString = context.Base_translateString \n
 \n
 context.Base_edit(form_id=\'Person_viewAsWeb\')\n
 \n
 context.ERP5Site_redirect(\'%s/account\' % context.getWebSiteValue().absolute_url(), \\\n
-                          keep_items={\'portal_status_message\': translateString("Your personal informations are updated.", mapping = dict())})\n
+                          keep_items={\'portal_status_message\': translateString("Your personal informations are now updated.", mapping = dict())})\n
 </string> </value>
         </item>
         <item>
@@ -66,6 +77,10 @@ context.ERP5Site_redirect(\'%s/account\' % context.getWebSiteValue().absolute_ur
         <item>
             <key> <string>id</string> </key>
             <value> <string>Person_editPersonalInformation</string> </value>
+        </item>
+        <item>
+            <key> <string>title</string> </key>
+            <value> <string>Edit customer information</string> </value>
         </item>
       </dictionary>
     </pickle>

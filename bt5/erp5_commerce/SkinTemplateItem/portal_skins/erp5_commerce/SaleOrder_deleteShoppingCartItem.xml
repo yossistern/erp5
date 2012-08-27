@@ -188,8 +188,11 @@
             <key> <string>_body</string> </key>
             <value> <string>"""\n
   Delete a shopping cart item.\n
-"""\n
 \n
+  TODO:\n
+  - use form validation (Base_edit)\n
+  - use \'form_id\' instead of hardcoded value \'SaleOrder_viewAsWeb\'\n
+"""\n
 translateString = context.Base_translateString\n
 shopping_cart = context.SaleOrder_getShoppingCart()\n
 \n

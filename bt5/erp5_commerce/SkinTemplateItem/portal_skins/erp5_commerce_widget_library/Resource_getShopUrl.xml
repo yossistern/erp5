@@ -50,7 +50,19 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>return \'%s/%s\' % (context.getAbsoluteUrl(), \'Resource_viewAsShop\')\n
+            <value> <string>"""\n
+Return a URL for the product to display. If a default display\n
+varition was defined by side effect, take it into account.\n
+\n
+TODO:\n
+- make generic implementation of variation selection\n
+"""\n
+\n
+variation = context.REQUEST.get(\'default_displayed_variation\', None)\n
+if not variation:\n
+  return \'%s/%s\' % (context.getAbsoluteUrl(), \'Resource_viewAsShop\')\n
+\n
+return \'%s/%s?variation=%s\' % (context.getAbsoluteUrl(), \'Resource_viewAsShop\', variation)\n
 </string> </value>
         </item>
         <item>

@@ -50,7 +50,15 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""Get the shopping cart customer"""\n
+            <value> <string>"""\n
+  Get the shopping cart customer object.\n
+\n
+  TODO:\n
+  - double check this method since the word "buyer"\n
+    has been used in other placed to name what is actually\n
+    the vendor, or has been used for other purpose.\n
+  - make sure this method really makes any sense\n
+"""\n
 shopping_cart = context.SaleOrder_getShoppingCart()\n
 return shopping_cart.getDestinationDecisionValue()\n
 </string> </value>

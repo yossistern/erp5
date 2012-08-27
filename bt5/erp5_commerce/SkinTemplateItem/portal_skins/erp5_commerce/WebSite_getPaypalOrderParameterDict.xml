@@ -50,7 +50,11 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>order_parameter_dict = context.WebSite_getPaypalSecurityParameterDict()\n
+            <value> <string>"""\n
+  TODO:\n
+  - use generic paypal implementation of ERP5\n
+"""\n
+order_parameter_dict = context.WebSite_getPaypalSecurityParameterDict()\n
 if order_parameter_dict is None:\n
   return None\n
 \n

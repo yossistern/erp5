@@ -52,9 +52,14 @@
             <key> <string>_body</string> </key>
             <value> <string>""" \n
   Return default currency used in Shopping Cart.\n
+\n
+  TODO:\n
+  - remove hardcoding of currency_module/EUR \n
+    (ex. use system properties for example)\n
 """\n
 web_site = context.getWebSiteValue()\n
-return context.getPortalObject().restrictedTraverse(web_site.getLayoutProperty(\'ecommerce_base_currency\', \'currency_module/EUR\'))\n
+return context.getPortalObject().restrictedTraverse(\n
+  web_site.getLayoutProperty(\'ecommerce_base_currency\', \'currency_module/EUR\'))\n
 </string> </value>
         </item>
         <item>

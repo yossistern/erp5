@@ -50,7 +50,9 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""Return the default trade condition"""\n
+            <value> <string>"""\n
+  Return the default trade condition for thie ecommerce site\n
+"""\n
 default = "sale_trade_condition_module/default_trade_condition"\n
 \n
 website = context.getWebSiteValue()\n
@@ -67,6 +69,10 @@ return context.getPortalObject().restrictedTraverse(default)\n
         <item>
             <key> <string>id</string> </key>
             <value> <string>SaleOrder_getDefaultTradeCondition</string> </value>
+        </item>
+        <item>
+            <key> <string>title</string> </key>
+            <value> <string>Return default trade condition</string> </value>
         </item>
       </dictionary>
     </pickle>

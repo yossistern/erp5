@@ -50,7 +50,11 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>response_parameter_dict = context.WebSection_submitPaypalNVPRequest(parameter_dict=context.WebSite_getPaypalOrderParameterDict(),\n
+            <value> <string>"""\n
+  TODO:\n
+  - use generic paypal implementation of ERP5\n
+"""\n
+response_parameter_dict = context.WebSection_submitPaypalNVPRequest(parameter_dict=context.WebSite_getPaypalOrderParameterDict(),\n
                                                                   nvp_url=context.WebSite_getPaypalUrl(api=\'nvp\', alternative_url=alternative_url))\n
 \n
 if response_parameter_dict is None:\n

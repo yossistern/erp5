@@ -51,7 +51,11 @@
         <item>
             <key> <string>_body</string> </key>
             <value> <string>""" \n
-  Return the sort title of the default currency used in Shopping Cart.\n
+  Return the short title of the default currency used in Shopping Cart.\n
+\n
+  TODO:\n
+  - the currency symbol and code are used inconsistently\n
+    take a decision of which to use where and stick to it\n
 """\n
 return context.getWebSiteValue().WebSite_getShoppingCartDefaultCurrency().getShortTitle()\n
 </string> </value>

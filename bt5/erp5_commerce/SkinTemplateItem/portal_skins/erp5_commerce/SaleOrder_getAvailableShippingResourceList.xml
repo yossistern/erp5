@@ -187,8 +187,11 @@
         <item>
             <key> <string>_body</string> </key>
             <value> <string>"""\n
- This will return all Products that have set product_line=\'shipping\'. XXX\n
+ This script return all Products which product_line category is set to \'shipping\'. \n
  Such products are used for shipping purposes i.e. they can not be sold.\n
+\n
+ TODO:\n
+ - change hardcoded category from \'product_line\' to a site dependent category\n
 """\n
 portal = context.getPortalObject()\n
 \n

@@ -51,10 +51,17 @@
         <item>
             <key> <string>_body</string> </key>
             <value> <string>"""\n
-  Return list of shopping cart items.\n
-  XXX : get order_line as tree not just on first level\n
+  Return list of shopping cart items as list representing order lines.\n
+\n
+  TODO:\n
+  - rename shopping_cart_order_lines to shopping_cart_order_line_list\n
+  - make this method compatible with cells and trees in orders. Orders\n
+    are not always flat. Consider large projects or matrices in B2B sales\n
+    of apparel. SaleOrder_getShoppingCartItemTree would be a better\n
+    name probably.\n
+  - make sure this script is not called more than once per page\n
 """\n
-shopping_cart_order_lines = context.SaleOrder_getShoppingCart().contentValues()\n
+shopping_cart_order_lines = context.SaleOrder_getShoppingCart().contentValues(portal_type="Sale Order Line")\n
 if include_shipping:\n
   return shopping_cart_order_lines\n
 else:\n

@@ -61,7 +61,6 @@
   \n
   Script can optionally include currency.\n
 """\n
-\n
 web_site = context.getWebSiteValue()\n
 total = 0.0\n
 shopping_cart_item_list = context.SaleOrder_getShoppingCartItemList(include_shipping)\n

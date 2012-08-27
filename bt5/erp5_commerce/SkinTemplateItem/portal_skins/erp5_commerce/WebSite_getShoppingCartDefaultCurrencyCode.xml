@@ -52,6 +52,9 @@
             <key> <string>_body</string> </key>
             <value> <string>""" \n
   Return reference of the default currency used in Shopping Cart.\n
+\n
+  TODO:\n
+  - add pretty printing of currency (if it makes sense here)\n
 """\n
 website = context.getWebSiteValue()\n
 if website:\n

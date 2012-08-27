@@ -65,7 +65,7 @@ if parameter_dict[\'PAYERID\'] != payer_id:\n
 \n
 #redirect user to the checkout section\n
 website = context.getWebSiteValue() \n
-section_url = website.getLayoutProperty(\'ecommerce_checkout_section_id\',"checkout")\n
+section_url = website.getLayoutProperty(\'ecommerce_checkout_section_id\', \'checkout\')\n
 website.Base_redirect(section_url, \\\n
                        keep_items={\'portal_status_message\':translateString("The payment procedure went well on Paypal."),\n
                                       \'token\':token})\n
