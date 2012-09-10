@@ -1,3 +1,6 @@
+2012-09-10 Rafael
+* Major refactoring and clean up.
+
 2011-03-10 Kazuhiko
 * by default, all installed business templates will be upgraded, not all existing business templates in the repository.
 
