@@ -78,6 +78,7 @@ class Alarm(XMLObject, PeriodicityMixin):
                     , PropertySheet.Task
                     , PropertySheet.Configurable
                     , PropertySheet.Alarm
+                    , PropertySheet.SortIndex
                     )
 
   security.declareProtected(Permissions.AccessContentsInformation, 'isActive')
