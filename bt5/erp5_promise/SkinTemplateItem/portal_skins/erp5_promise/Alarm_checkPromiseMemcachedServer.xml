@@ -65,9 +65,19 @@ url = "memcached://%s/" % plugin.getUrlString()\n
 active_result = ActiveResult()\n
 \n
 if promise_url != url:\n
-  severity = 1\n
-  summary = "Memcached not configured as expected"\n
-  detail = "Expect %s\\nGot %s" % (promise_url, url)\n
+  if fixit:\n
+    protocol, promise_url = promise_url.split(\'://\', 1)\n
+    domain_port = promise_url.split(\'/\', 1)[0]\n
+    port = domain_port.split(\':\')[-1]\n
+    domain = domain_port[:-(len(port)+1)]\n
+    plugin.edit(url_string="%s:%s" % (domain, port))\n
+    severity = 1\n
+    summary = "Memcached not configured as expected but it was fixed."\n
+    detail = "Expect %s\\nGot %s" % (promise_url, url)\n
+  else:\n
+    severity = 1\n
+    summary = "Memcached not configured as expected"\n
+    detail = "Expect %s\\nGot %s" % (promise_url, url)\n
 else:\n
   severity = 0\n
   summary = "Nothing to do."\n
@@ -84,7 +94,7 @@ context.newActiveProcess().postResult(active_result)\n
         </item>
         <item>
             <key> <string>_params</string> </key>
-            <value> <string>tag, fixit=False, **kw</string> </value>
+            <value> <string>tag="promise", fixit=False, **kw</string> </value>
         </item>
         <item>
             <key> <string>id</string> </key>

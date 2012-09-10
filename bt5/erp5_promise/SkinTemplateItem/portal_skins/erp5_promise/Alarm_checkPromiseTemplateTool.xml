@@ -70,6 +70,8 @@ repository_list.sort()\n
 active_result = ActiveResult()\n
 \n
 if repository_list != promise_repository_list:\n
+  if fixit:\n
+    portal.portal_templates.updateRepositoryBusinessTemplateList(promise_repository.split())\n
   severity = 1\n
   summary = "Template tool not configured as expected"\n
   detail = \'\\n\'.join(promise_repository_list)\n
@@ -89,7 +91,7 @@ context.newActiveProcess().postResult(active_result)\n
         </item>
         <item>
             <key> <string>_params</string> </key>
-            <value> <string>tag, fixit=False, **kw</string> </value>
+            <value> <string>tag="promise", fixit=False, **kw</string> </value>
         </item>
         <item>
             <key> <string>id</string> </key>
