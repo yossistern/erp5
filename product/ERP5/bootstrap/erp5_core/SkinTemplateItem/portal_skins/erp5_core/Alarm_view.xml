@@ -82,6 +82,8 @@
                       <list>
                         <string>my_id</string>
                         <string>my_title</string>
+                        <string>my_int_index</string>
+                        <string>my_bootstrap_phase</string>
                         <string>my_periodicity_start_date</string>
                         <string>my_periodicity_stop_date</string>
                         <string>sense</string>

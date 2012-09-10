@@ -1,6 +1,7 @@
 action_type
 activity
 aggregate
+bootstrap_phase
 business_application
 callable_type
 causality

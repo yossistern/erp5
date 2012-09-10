@@ -153,6 +153,10 @@
                           <string>solve_method_id</string>
                           <string>Solve Method</string>
                         </tuple>
+                        <tuple>
+                          <string>bootstrap_phase_title</string>
+                          <string>Phase</string>
+                        </tuple>
                       </list>
                     </value>
                 </item>
