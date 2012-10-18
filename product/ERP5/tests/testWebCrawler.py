@@ -28,8 +28,7 @@
 ##############################################################################
 
 import unittest
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase,\
-     _getConversionServerDict
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 import urlnorm # This library is imported to detect lack of
                # urlnorm availibility in python environment
 
@@ -44,7 +43,6 @@ class TestWebCrawler(ERP5TypeTestCase):
   """
 
   _path_to_delete_list = []
-  system_pref_id = 'my_preference'
 
   def getTitle(self):
     """
@@ -56,7 +54,8 @@ class TestWebCrawler(ERP5TypeTestCase):
     """
       Return the list of required business templates.
     """
-    return ('erp5_core_proxy_field_legacy',
+    return ('erp5_promise',
+            'erp5_core_proxy_field_legacy',
             'erp5_base',
             'erp5_ingestion',
             'erp5_ingestion_mysql_innodb_catalog',
@@ -89,23 +88,11 @@ class TestWebCrawler(ERP5TypeTestCase):
     self.tic()
 
   def setSystemPreference(self):
-    portal_preferences = self.portal.portal_preferences
-    system_preference = portal_preferences._getOb(self.system_pref_id, None)
-    if system_preference is None:
-      system_preference = portal_preferences.newContent(id=self.system_pref_id,
-                                               portal_type='System Preference')
-    conversion_dict = _getConversionServerDict()
-    system_preference.\
-                   setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    system_preference.\
-                    setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    system_preference.setPreferredDocumentFilenameRegularExpression(
-                                                   FILENAME_REGULAR_EXPRESSION)
-    system_preference.setPreferredDocumentReferenceRegularExpression(
-                                                  REFERENCE_REGULAR_EXPRESSION)
-    if system_preference.getPreferenceState() != 'global':
-      system_preference.enable()
-
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
+    default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
+    default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
 
   def bootstrapWebSite(self):
     """Create 1 Website
@@ -278,7 +265,7 @@ class TestWebCrawler(ERP5TypeTestCase):
     self.assertFalse(len(new_web_crawler))
 
     # set another namespace on preference
-    preference = self.portal.portal_preferences[self.system_pref_id]
+    preference = self.portal.portal_preferences.getActiveSystemPreference()
     preference.setPreferredIngestionNamespace('NEW')
     self.tic()
     new_web_crawler.crawlContent()

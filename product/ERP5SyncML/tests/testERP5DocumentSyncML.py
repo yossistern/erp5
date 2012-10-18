@@ -31,8 +31,7 @@ import os
 import unittest
 from Testing import ZopeTestCase
 from Products.ERP5Type.tests.runUnitTest import tests_home
-from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase,\
-                                                       _getConversionServerDict
+from Products.ERP5Type.tests.ERP5TypeTestCase import ERP5TypeTestCase
 from AccessControl.SecurityManagement import newSecurityManager
 from Products.ERP5SyncML.Conduit.ERP5DocumentConduit import ERP5DocumentConduit
 from zLOG import LOG
@@ -118,7 +117,8 @@ class TestERP5DocumentSyncMLMixin(TestERP5SyncMLMixin):
     """
       Return the list of business templates.
     """
-    return ('erp5_base',
+    return ('erp5_promise',
+            'erp5_base',
             'erp5_syncml',
             'erp5_ingestion',
             'erp5_ingestion_mysql_innodb_catalog',
@@ -146,14 +146,11 @@ class TestERP5DocumentSyncMLMixin(TestERP5SyncMLMixin):
     self.clearPublicationsAndSubscriptions()
 
   def setSystemPreferences(self):
-    default_pref = self.portal.portal_preferences.default_site_preference
-    conversion_dict = _getConversionServerDict()
-    default_pref.setPreferredOoodocServerAddress(conversion_dict['hostname'])
-    default_pref.setPreferredOoodocServerPortNumber(conversion_dict['port'])
-    default_pref.setPreferredDocumentFileNameRegularExpression(FILENAME_REGULAR_EXPRESSION)
+    self.portal.portal_alarms.promise_conversion_server.solve()
+    self.tic()
+    default_pref = self.portal.portal_preferences.getActiveSystemPreference()
+    default_pref.setPreferredDocumentFilenameRegularExpression(FILENAME_REGULAR_EXPRESSION)
     default_pref.setPreferredDocumentReferenceRegularExpression(REFERENCE_REGULAR_EXPRESSION)
-    if default_pref.getPreferenceState() == 'disabled':
-      default_pref.enable()
 
   def addSubscriptions(self):
     portal_id = self.getPortalId()
