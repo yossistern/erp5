@@ -67,14 +67,6 @@ class TestMaxmaDemoConfiguratorWorkflow(TestLiveConfiguratorWorkflowMixin):
                        'erp5_l10n_pt-BR',
                        'erp5_demo_maxma_rule')
 
-  def getBusinessTemplateList(self):
-    return ('erp5_core_proxy_field_legacy',
-        'erp5_full_text_myisam_catalog',
-        'erp5_base',
-        'erp5_workflow',
-        'erp5_configurator',
-        'erp5_configurator_maxma_demo',)
-
   def stepCreateBusinessConfiguration(self, sequence=None,\
                    sequence_list=None, **kw):
     """ Create one Business Configuration """
@@ -140,7 +132,7 @@ class TestMaxmaDemoConfiguratorWorkflow(TestLiveConfiguratorWorkflowMixin):
     # Check Gadgets
     for gadget in self.portal.portal_gadgets.searchFolder():
       self.assertEquals('public', gadget.getValidationState(),
-                        "%s is not public but %s" % (gadget.getRelativeUrl(), 
+                        "%s is not public but %s" % (gadget.getRelativeUrl(),
                                                      gadget.getValidationState()))
       gadget.Base_checkConsistency()
 
@@ -151,7 +143,7 @@ class TestMaxmaDemoConfiguratorWorkflow(TestLiveConfiguratorWorkflowMixin):
     self.assertNotEquals(user.Person_getAvailableAssignmentValueList(), [])
     self.assertEquals(user.getTitle(), "Jack Vale")
     self.assertEquals(user.getValidationState(), "validated")
-    self.assertEquals(user.getSubordination(), 
+    self.assertEquals(user.getSubordination(),
                           'organisation_module/myorganisation')
     self.assertEquals(user.getSubordinationTitle(), "Maxma Co")
 

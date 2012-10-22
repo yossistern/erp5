@@ -1,7 +1,6 @@
 ##############################################################################
 # Copyright (c) 2011 Nexedi SA and Contributors. All Rights Reserved.
 #           Gabriel M. Monnerat <gabriel@tiolive.com>
-#           Xavier Hardy <xavier.hardy@tiolive.com>
 #
 # WARNING: This program as such is intended to be used by professional
 # programmers who take the whole responsability of assessing all potential
@@ -30,26 +29,44 @@ from Products.ERP5Type.tests.Sequence import SequenceList
 from Products.ERP5Configurator.tests.ConfiguratorTestMixin import \
                                              TestLiveConfiguratorWorkflowMixin
 
-class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
+class TestUNGConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
   """
-    Test RunMyDocs Configuration Workflow Mixin.
+    Test UNG Configuration Workflow Mixin.
   """
 
-  standard_bt5_list = ('erp5_jquery',
-                         'erp5_web',
-                         'erp5_ingestion_mysql_innodb_catalog',
-                         'erp5_ingestion',
-                         'erp5_ui_test_core',
-                         'erp5_dms',
-                         'erp5_jquery_ui',
-                         'erp5_slideshow_style',
-                         'erp5_knowledge_pad',
-                         'erp5_run_my_doc',
-                         'erp5_run_my_doc_role')
+  standard_bt5_list = ('erp5_ingestion_mysql_innodb_catalog',
+                       'erp5_simulation',
+                       'erp5_dhtml_style',
+                       'erp5_jquery',
+                       'erp5_jquery_ui',
+                       'erp5_web',
+                       'erp5_ingestion',
+                       'erp5_dms',
+                       'erp5_crm',
+                       'erp5_knowledge_pad',
+                       'erp5_jquery_plugin_spinbtn',
+                       'erp5_jquery_plugin_jgraduate',
+                       'erp5_jquery_plugin_svgicon',
+                       'erp5_jquery_plugin_hotkey',
+                       'erp5_jquery_plugin_jquerybbq',
+                       'erp5_jquery_plugin_svg_editor',
+                       'erp5_jquery_plugin_sheet',
+                       'erp5_jquery_plugin_mbmenu',
+                       'erp5_jquery_plugin_jqchart',
+                       'erp5_jquery_plugin_colorpicker',
+                       'erp5_jquery_plugin_elastic',
+                       'erp5_jquery_plugin_wdcalendar',
+                       'erp5_jquery_sheet_editor',
+                       'erp5_xinha_editor',
+                       'erp5_svg_editor',
+                       'erp5_email_reader',
+                       'erp5_web_ung_core',
+                       'erp5_web_ung_theme',
+                       'erp5_web_ung_role')
 
   DEFAULT_SEQUENCE_LIST = """
      stepCreateBusinessConfiguration
-     stepSetRunMyDocsWorkflow
+     stepSetUNGWorkflow
      stepConfiguratorNext
      stepTic
      stepCheckBT5ConfiguratorItem
@@ -78,35 +95,29 @@ class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
      stepCheckInstallConfiguration
      stepStartConfigurationInstallation
      stepTic
+     stepCheckUNGWebSiteAfterInstallation
      stepCheckSystemPreferenceAfterInstallation
      stepCheckUserPreferenceAfterInstallation
+     stepCheckWebSiteRoles
      stepCheckKnowledgePadRole
+     stepCheckCreateNewEvent
   """
-
-  def getBusinessTemplateList(self):
-    return ('erp5_promise',
-        'erp5_core_proxy_field_legacy',
-        'erp5_full_text_myisam_catalog',
-        'erp5_base',
-        'erp5_workflow',
-        'erp5_configurator',
-        'erp5_configurator_run_my_doc',)
 
   def stepCreateBusinessConfiguration(self, sequence=None, sequence_list=None, **kw):
     """ Create one Business Configuration """
     module = self.portal.business_configuration_module
     business_configuration = module.newContent(
                                portal_type="Business Configuration",
-                               title='Test Configurator RunMyDocs Workflow')
+                               title='Test Configurator UNG Workflow')
     next_dict = {}
     sequence.edit(business_configuration=business_configuration,
                   next_dict=next_dict)
 
-  def stepSetRunMyDocsWorkflow(self, sequence=None, sequence_list=None, **kw):
-    """ Set RunMyDocs Workflow into Business Configuration """
+  def stepSetUNGWorkflow(self, sequence=None, sequence_list=None, **kw):
+    """ Set UNG Workflow into Business Configuration """
     business_configuration = sequence.get("business_configuration")
     self.setBusinessConfigurationWorkflow(business_configuration,
-                                   "workflow_module/run_my_doc_configuration_workflow")
+                                   "workflow_module/ung_configuration_workflow")
 
   def stepSetupOrganisationConfiguratorItem(self, sequence=None, sequence_list=None, **kw):
     """ Create one Organisation with Basic information """
@@ -117,6 +128,7 @@ class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
         field_your_default_address_street_address='.',
         field_your_default_address_zip_code='59000')
     sequence.edit(next_dict=next_dict)
+
 
   def stepCheckOrganisationConfiguratorItem(self, sequence=None, sequence_list=None, **kw):
     """ Check if organisation was created fine """
@@ -145,13 +157,13 @@ class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
     sequence.edit(next_dict=next_dict)
 
   def stepCheckConfigurePreferenceForm(self, sequence=None, sequence_list=None, **kw):
-    """ Check the multiple user account form """
+    """ Check the preference form """
     response_dict = sequence.get("response_dict")
     if 'command' in response_dict:
       self.assertEquals('show', response_dict['command'])
     self.assertEquals('Previous', response_dict['previous'])
     self.assertEquals('Configure ERP5 Preferences', response_dict['next'])
-    self.assertCurrentStep('RunMyDoc Preferences', response_dict)
+    self.assertCurrentStep('UNG Preferences', response_dict)
 
   def stepSetupPreferenceConfigurationBrazil(self, sequence=None, sequence_list=None, **kw):
     """ Setup the Brazil preference configuration """
@@ -191,6 +203,11 @@ class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
      person_config_item = person_config_save["3"]
      self.assertEquals(person_config_item.getReference(), "french_assignor")
 
+  def stepCheckConfigureInstallationForm(self, sequence=None, sequence_list=None, **kw):
+    """ Check the installation form """
+    response_dict = sequence.get("response_dict")
+    self.assertEquals('show', response_dict['command'])
+
   def stepCheckUserPreferenceAfterInstallation(self, sequence=None, sequence_list=None, **kw):
     """ Check System Preference"""
     portal_catalog = self.portal.portal_catalog
@@ -203,30 +220,92 @@ class TestRunMyDocsConfiguratorWorkflowMixin(TestLiveConfiguratorWorkflowMixin):
     preference = portal_catalog.getResultValue(portal_type="Preference",
                                                title='Preference for Person Creator')
     self.assertEquals(preference.getPreferenceState(), "enabled")
+    preference = self.portal.portal_preferences.ung_preference
+    self.assertEquals(preference.getPreferenceState(), "global")
+
+  def _stepCheckWebSiteRoles(self):
+    """ Check permission of Web Site with normal user """
+    self.changeSkin("UNGDoc")
+    self.portal.web_page_module.ERP5Site_createNewWebDocument("web_page_template")
+    self.tic()
+    self.changeSkin("UNGDoc")
+    result_list = self.portal.web_site_module.ung.WebSection_getWebPageObjectList()
+    self.assertEquals(len(result_list), 1)
+    self.assertEquals(result_list[0].getTitle(), "Web Page")
+    new_object = self.portal.web_page_module.newContent(portal_type="Web Page")
+    new_object.edit(title="New")
+    new_object = self.portal.web_page_module.newContent(portal_type="Web Table")
+    new_object.edit(title="New")
+    new_object = self.portal.web_page_module.newContent(portal_type="Web Illustration")
+    new_object.edit(title="New")
+    self.tic()
+    kw = {"portal_type": "Web Page", "title": "New"}
+    self.changeSkin("UNGDoc")
+    result_list = self.portal.web_site_module.ung.WebSection_getWebPageObjectList(**kw)
+    self.assertEquals(len(result_list), 1)
+    self.assertEquals(result_list[0].getPortalType(), "Web Page")
+    kw["portal_type"] = "Web Illustration"
+    self.changeSkin("UNGDoc")
+    result_list = self.portal.web_site_module.ung.WebSection_getWebPageObjectList(**kw)
+    self.assertEquals(len(result_list), 1)
+    self.assertEquals(result_list[0].getPortalType(), "Web Illustration")
+    kw["portal_type"] = "Web Table"
+    self.changeSkin("UNGDoc")
+    result_list = self.portal.web_site_module.ung.WebSection_getWebPageObjectList(**kw)
+    self.assertEquals(len(result_list), 1)
+    self.assertEquals(result_list[0].getPortalType(), "Web Table")
 
   def _stepCheckKnowledgePadRole(self):
     """ Check if Knowledge Pad is configured correctly """
-    self.portal.ERP5Site_createDefaultKnowledgePadListForUser()
+    pad = self.portal.knowledge_pad_module.newContent(portal_type="Knowledge Pad")
+    pad.edit(publication_section_value=self.portal.web_site_module.ung)
+    pad.visible()
     self.tic()
-    current_user = self.portal.portal_membership.getAuthenticatedMember().getUserName()
-    pad = self.portal.portal_catalog.getResultValue(portal_type="Knowledge Pad", 
-                                             owner=current_user)
-    gadget_uid = self.portal.portal_gadgets.test_wizard_gadget.getUid()
-    self.portal.KnowledgePad_addBoxList(uids=[gadget_uid],
-                                        active_pad_relative_url=pad.getRelativeUrl())
+    gadget = self.portal.portal_gadgets.searchFolder()[0]
+    gadget_id = gadget.getId()
+    self.changeSkin("UNGDoc")
+    self.portal.web_site_module.ung.WebSection_addGadgetList(gadget_id)
     self.tic()
-    self.assertEquals(len(pad.contentValues()), 1)
-    box = pad.contentValues()[0]
-    self.assertEquals(box.getValidationState(), 'visible')
-    self.assertEquals(box.getSpecialise(), 'portal_gadgets/test_wizard_gadget')
+    box_list = pad.contentValues()
+    self.assertEquals(len(box_list), 1)
+    knowledge_box = box_list[0]
+    self.assertEquals(pad.getPublicationSection(), 'web_site_module/ung')
+    self.assertTrue(knowledge_box.getSpecialiseValue().getId() == gadget_id)
 
-class TestRunMyDocsConfiguratorWorkflowFranceLanguage(TestRunMyDocsConfiguratorWorkflowMixin):
+  def _stepCheckCreateNewEvent(self):
+    """ """
+    portal = self.portal
+    event_dict = dict(portal_type="Note",
+                      title="Buy Phone",
+                      event_text_content="testUNG Sample",
+                      start_date_hour=11,
+                      start_date_minute=12,
+                      start_date_day=12,
+                      start_date_month=02,
+                      start_date_year=2011,
+                      stop_date_hour=12,
+                      stop_date_minute=12,
+                      stop_date_day=13,
+                      stop_date_month=02,
+                      stop_date_year=2011)
+    portal.REQUEST.form.update(event_dict)
+    self.changeSkin("UNGDoc")
+    portal.event_module.EventModule_createNewEvent()
+    self.tic()
+    event = portal.portal_catalog.getResultValue(portal_type="Note")
+    self.assertEquals(event.getDescription(), "testUNG Sample")
+    start_date = event.getStartDate()
+    self.assertEquals(start_date.month(), 2)
+    self.assertEquals(start_date.minute(), 12)
+
+
+class TestUNGConfiguratorWorkflowFranceLanguage(TestUNGConfiguratorWorkflowMixin):
   """
-    Test RunMyDocs Configuration Workflow
+    Test UNG Configuration Workflow
   """
 
-  def test_run_my_docs_workflow_france(self):
-    """ Test the RunMyDocs workflow with french language """
+  def test_ung_workflow_france(self):
+    """ Test the ung workflow with french language """
     sequence_list = SequenceList()
     sequence_string = self.DEFAULT_SEQUENCE_LIST % dict(country='France')
     sequence_list.addSequenceString(sequence_string)
@@ -263,23 +342,74 @@ class TestRunMyDocsConfiguratorWorkflowFranceLanguage(TestRunMyDocsConfiguratorW
     ]
     self._stepSetupMultipleUserAccountThree(sequence, user_list)
 
+  def stepSetupWebSiteConfiguration(self, sequence=None, sequence_list=None, **kw):
+    """ Setup Web Site """
+    next_dict = dict(your_default_available_language="fr")
+    sequence.edit(next_dict=next_dict)
+
+  def stepCheckUNGWebSiteAfterInstallation(self, sequence=None, sequence_list=None, **kw):
+    """ Check if UNG Web Site is published and your language"""
+    ung_web_site = self.portal.web_site_module.ung
+    portal_catalog = self.portal.portal_catalog
+    self.assertEquals(ung_web_site.getValidationState(),
+                      "published")
+    self.assertEquals(ung_web_site.getDefaultAvailableLanguage(),
+                      "fr")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="french_creator")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Creator')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="french_assignee")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Assignee')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="french_assignor")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Assignor')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+
+  def stepCheckWebSiteRoles(self, sequence=None, sequence_list=None, **kw):
+    """ Check permission of Web Site with normal user """
+    self.login("french_assignor")
+    self._stepCheckWebSiteRoles()
+
   def stepCheckKnowledgePadRole(self, sequence=None, sequence_list=None, **kw):
     self.login("french_creator")
     self._stepCheckKnowledgePadRole()
 
+  def stepCheckCreateNewEvent(self, sequence=None, sequence_list=None, **kw):
+    self.login("french_assignee")
+    self._stepCheckCreateNewEvent()
 
 
-class TestRunMyDocsConfiguratorWorkflowBrazilLanguage(TestRunMyDocsConfiguratorWorkflowMixin):
+class TestUNGConfiguratorWorkflowBrazilLanguage(TestUNGConfiguratorWorkflowMixin):
   """
-    Test RunMyDocs Configuration Workflow
+    Test UNG Configuration Workflow
   """
 
-  def test_run_my_docs_workflow_brazil(self):
-    """ Test the RunMyDocs workflow with brazilian language """
+  def test_ung_workflow_brazil(self):
+    """ Test the ung workflow with brazilian language """
     sequence_list = SequenceList()
     sequence_string = self.DEFAULT_SEQUENCE_LIST % dict(country='Brazil')
     sequence_list.addSequenceString(sequence_string)
     sequence_list.play(self)
+
+  def stepSetupWebSiteConfiguration(self, sequence=None, sequence_list=None, **kw):
+    """ Setup Web Site """
+    next_dict = dict(your_default_available_language="pt-BR")
+    sequence.edit(next_dict=next_dict)
 
   def stepSetupMultipleUserAccountThree(self, sequence=None, sequence_list=None, **kw):
     """ Create multiple user account """
@@ -312,6 +442,48 @@ class TestRunMyDocsConfiguratorWorkflowBrazilLanguage(TestRunMyDocsConfiguratorW
     ]
     self._stepSetupMultipleUserAccountThree(sequence, user_list)
 
+  def stepCheckUNGWebSiteAfterInstallation(self, sequence=None, sequence_list=None, **kw):
+    """ Check if UNG Web Site is published and your language """
+    ung_web_site = self.portal.web_site_module.ung
+    portal_catalog = self.portal.portal_catalog
+    self.assertEquals(ung_web_site.getValidationState(),
+                      "published")
+    self.assertEquals(ung_web_site.getDefaultAvailableLanguage(),
+                      "pt-BR")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="person_creator")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Creator')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="person_assignee")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Assignee')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+    person = portal_catalog.getResultValue(portal_type="Person",
+                                           reference="person_assignor")
+    self.assertEquals(person.getValidationState(), 'validated')
+    self.assertEquals(person.getFirstName(), 'Person')
+    self.assertEquals(person.getLastName(), 'Assignor')
+    assignment = person.contentValues(portal_type="Assignment")[0]
+    self.assertEquals(assignment.getValidationState(), "open")
+    self.assertEquals(assignment.getFunction(), "ung_user")
+
+  def stepCheckWebSiteRoles(self, sequence=None, sequence_list=None, **kw):
+    """ Check permission of Web Site with normal user """
+    self.login("person_assignor")
+    self._stepCheckWebSiteRoles()
+
   def stepCheckKnowledgePadRole(self, sequence=None, sequence_list=None, **kw):
     self.login("person_creator")
     self._stepCheckKnowledgePadRole()
+
+  def stepCheckCreateNewEvent(self, sequence=None, sequence_list=None, **kw):
+    self.login("person_assignee")
+    self._stepCheckCreateNewEvent()
