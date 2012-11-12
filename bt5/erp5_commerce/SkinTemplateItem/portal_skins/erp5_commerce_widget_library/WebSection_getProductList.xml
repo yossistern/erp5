@@ -50,28 +50,39 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>#TODO : USE CACHE\n
-#the goal of this script is to get all the related product of this section\n
+            <value> <string># the goal of this script is to get all the related product of this section\n
+from Products.ERP5Type.Cache import CachingMethod\n
 current_web_section = context.REQUEST.get(\'current_web_section\', context)\n
-product_list = []\n
 \n
 if not kw.has_key(\'portal_type\'):\n
   kw[\'portal_type\'] = \'Product\'\n
+\t \n
+if not kw.has_key(\'limit\'):\t \n
+  kw[\'limit\'] = limit\n
 \t\t \n
-if not kw.has_key(\'limit\'):\t\t \n
-  kw[\'limit\'] = limit\t\t \n
-\t\t \n
-if not kw.has_key(\'all_versions\'):\t\t \n
-  kw[\'all_versions\'] = 1\t\t \n
+if not kw.has_key(\'all_versions\'):\t \n
+  kw[\'all_versions\'] = 1\n
 \t\t \n
 if not kw.has_key(\'all_languages\'):\t\t \n
-  kw[\'all_languages\'] = 1\t\t \n
+  kw[\'all_languages\'] = 1\n
 \t\t \n
 for key in [\'limit\',\'all_versions\',\'all_languages\']:\t\t \n
-  kw[key] = int(kw[key])\t\t \n
+  kw[key] = int(kw[key])\n
+\n
+\n
+def getProductList(context_relative_url, limit, all_versions, all_languages):\n
+  # Gabriel: The condition was added to not break the paypal return\n
+  # after finish the payment. The verify_sign is checked because all\n
+  # data from paypal have this key\n
+  if kw.has_key(\'quantity\') and kw.has_key("verify_sign"):\n
+    del kw[\'quantity\']\n
 \t\t \n
-product_list = current_web_section.getDocumentValueList(**kw)\n
-return product_list\n
+  return current_web_section.getDocumentValueList(**kw)\n
+\n
+\n
+return CachingMethod(getProductList,\n
+    id="WebSection_getProductList_ecommerce",\n
+    cache_factory=\'erp5_ui_short\')(current_web_section.getRelativeUrl(),kw[\'limit\'],kw[\'all_versions\'], kw[\'all_languages\'])\n
 </string> </value>
         </item>
         <item>
