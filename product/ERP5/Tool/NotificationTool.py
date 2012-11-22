@@ -282,6 +282,10 @@ class NotificationTool(BaseTool):
     catalog_tool = getToolByName(self, 'portal_catalog')
     if portal_type_list is None:
       portal_type_list = ('Person',)
+
+    if not isinstance(notifier_list, (tuple, list)):
+      raise TypeError("Notifier list must be a list of portal types")
+
     # Find "From" Person
     from_person = None
     if isinstance(sender, basestring):
