@@ -54,6 +54,7 @@
 
 # The goal of this script is to get all the products from all the visible Web Sections\n
 # and it must select randomly which product must be displayed for a given context.\n
+from Products.ERP5Type.Cache import CachingMethod\n
 \n
 if not kw.has_key(\'portal_type\'):\n
   kw[\'portal_type\'] = \'Product\'\n
