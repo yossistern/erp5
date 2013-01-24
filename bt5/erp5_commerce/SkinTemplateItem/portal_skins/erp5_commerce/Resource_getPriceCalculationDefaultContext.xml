@@ -106,10 +106,6 @@ return movement\n
             <key> <string>id</string> </key>
             <value> <string>Resource_getPriceCalculationDefaultContext</string> </value>
         </item>
-        <item>
-            <key> <string>title</string> </key>
-            <value> <string>Build movement context to compute price</string> </value>
-        </item>
       </dictionary>
     </pickle>
   </record>

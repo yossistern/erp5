@@ -50,13 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  Returns true if the shopping cart is empty\n
-\n
-  TODO:\n
-  - make sure this script is not called more than once per page\n
-"""\n
-return len(context.SaleOrder_getShoppingCartItemList())==0\n
+            <value> <string>return len(context.SaleOrder_getShoppingCartItemList())==0\n
 </string> </value>
         </item>
         <item>

@@ -50,16 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  Displays the current person information (ie. the one of the customer defined in the shopping cart).\n
-\n
-  TODO:\n
-  - reimplement using Person_viewAsWeb and appropriate form_view_editable template\n
-  - it is probably not needed to use the shopping cart to know who is the customer\n
-    (unless we want one use to update information of another user)\n
-  - consider merging this with standard user preference settings of ERP5 web\n
-"""\n
-context.REQUEST.set(\'editable_mode\', 1)\n
+            <value> <string>context.REQUEST.set(\'editable_mode\', 1)\n
 person_object = context.getWebSiteValue().SaleOrder_getShoppingCartCustomer()\n
 return context.getWebSectionValue().restrictedTraverse(person_object.getRelativeUrl()).Person_viewAsWeb(context.REQUEST)\n
 </string> </value>

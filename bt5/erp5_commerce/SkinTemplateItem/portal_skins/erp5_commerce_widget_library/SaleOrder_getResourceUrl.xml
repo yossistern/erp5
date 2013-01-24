@@ -50,14 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  TODO:\n
-  - it should be possible to have more than one root\n
-    product lines. In such case, using a predicate would\n
-    be way easier.... simply by checking if the root\n
-    predicate(s) apply\n
-"""\n
-web_site = context.getWebSiteValue()\n
+            <value> <string>web_site = context.getWebSiteValue()\n
 resource = context.getResourceValue()\n
 web_site_product_line = web_site.getLayoutProperty(\'ecommerce_base_product_line\')\n
 portal_categories = context.getPortalObject().portal_categories\n

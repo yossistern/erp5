@@ -50,10 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  Return shopping cart ID\n
-"""\n
-return context.REQUEST.get(\'session_id\')\n
+            <value> <string>return context.REQUEST.get(\'session_id\')\n
 </string> </value>
         </item>
         <item>
@@ -66,7 +63,7 @@ return context.REQUEST.get(\'session_id\')\n
         </item>
         <item>
             <key> <string>title</string> </key>
-            <value> <string>Get shopping cart ID</string> </value>
+            <value> <string>Get shopping cart id</string> </value>
         </item>
       </dictionary>
     </pickle>

@@ -50,11 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  TODO:\n
-  - use generic paypal implementation of ERP5\n
-"""\n
-if context.getLayoutProperty(\'ecommerce_test_environment_enabled\', False):\n
+            <value> <string>if context.getLayoutProperty(\'ecommerce_test_environment_enabled\', False):\n
   security_parameter_dict = {\'USER\':context.getLayoutProperty(\'ecommerce_paypal_sandbox_username\', None),\n
                              \'PWD\':context.getLayoutProperty(\'ecommerce_paypal_sandbox_password\', None),\n
                              \'SIGNATURE\':context.getLayoutProperty(\'ecommerce_paypal_sandbox_signature\', None),\n

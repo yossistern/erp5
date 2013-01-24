@@ -50,16 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  Get the shopping cart customer as a Person object.  \n
-\n
-  TODO:\n
-  - add some consistency checks so that if current user\n
-    is not the current one defined in shopping\n
-    cart then reset shopping cart before proceeding. This\n
-    could happen if a wrong sequence of logout / add to cart\n
-    by two people sharing the same Web browser happens.\n
-"""\n
+            <value> <string>"""Get the shopping cart customer"""\n
 shopping_cart = context.SaleOrder_getShoppingCart()\n
 result = shopping_cart.getDestinationSectionValue()\n
 if result is None:\n

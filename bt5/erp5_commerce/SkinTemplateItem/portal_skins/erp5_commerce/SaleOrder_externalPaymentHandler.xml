@@ -188,7 +188,7 @@
             <key> <string>_body</string> </key>
             <value> <string>""" \n
   This script is called by external payment system.\n
-  It is possible to check here whether payment was successfull or not.\n
+  Here you can check if payment was successfull or not.\n
 """\n
 \n
 # XXX: implement external payment check\n

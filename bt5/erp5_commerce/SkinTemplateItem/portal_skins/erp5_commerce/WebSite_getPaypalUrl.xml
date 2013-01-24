@@ -50,11 +50,7 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  TODO:\n
-  - use generic paypal implementation of ERP5\n
-"""\n
-if alternative_url is not None:\n
+            <value> <string>if alternative_url is not None:\n
   return alternative_url\n
 \n
 test_environement = context.getLayoutProperty(\'ecommerce_test_environment_enabled\', None)\n

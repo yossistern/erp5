@@ -189,11 +189,7 @@
             <value> <string encoding="cdata"><![CDATA[
 
 \'\'\'\n
-  If all product have no weight, then it does not need to be shipped.\n
-\n
-  TODO:\n
-  - use ERP5 constrain framework checkConsistency/fixConsistency\n
-    in order to be perfectly generic\n
+If all product have no Weight, it don\'t need to be sheep. \n
 \'\'\'\n
 return False\n
 shopping_cart_items = context.SaleOrder_getShoppingCartItemList()\n

@@ -50,34 +50,17 @@
         </item>
         <item>
             <key> <string>_body</string> </key>
-            <value> <string>"""\n
-  Tries to find a Web Page related to the current Product\n
-  with publication section set to "website/product/short_description"\n
+            <value> <string>portal = context.getPortalObject()\n
 \n
-  This short description made of HTML can be used to provide\n
-  a better description than the one provided by default on\n
-  the product.\n
+#get cached description\n
+# TODO\n
 \n
-  TODO:\n
-  - use cache for description\n
-  - remove hardcoding by using site properties\n
-  - make sure we can include javascript in HTML\n
-    of web pages (a generic requirement which will lead\n
-    to changes in ERP5 TextDocument class)\n
-  - Rename to Resource_... since this script also\n
-    applied to services\n
-  - Handle language and version selection, possibily predicate\n
-    just like WebSection\n
-  - rename to use asHTML terminology\n
-"""\n
-portal = context.getPortalObject()\n
-category_path = \'portal_categories/publication_section/website/product/short_description\'\n
-\n
-# Find a related web page with appropriate publication_section\n
+#get live description\n
 web_page = portal.portal_catalog(portal_type=\'Web Page\',\n
-                        default_follow_up_uid=context.getUid(),\n
-                        default_publication_section_uid=context.restrictedTraverse(category_path).getUid(), # XXX Bad hardcoding\n
-                    )\n
+                                 default_follow_up_uid=context.getUid(),\n
+                                 default_publication_section_uid=context.restrictedTraverse(\'portal_categories/publication_section/website/product/short_description\').getUid(),\n
+                                 #src__=1,\n
+                                 )\n
 if web_page is None or len(web_page) == 0:\n
   return context.Base_translateString("No more information for this product.")\n
 return web_page[0].getObject().asStrippedHTML()\n
@@ -90,10 +73,6 @@ return web_page[0].getObject().asStrippedHTML()\n
         <item>
             <key> <string>id</string> </key>
             <value> <string>Product_getRelatedDescription</string> </value>
-        </item>
-        <item>
-            <key> <string>title</string> </key>
-            <value> <string>Get product description</string> </value>
         </item>
       </dictionary>
     </pickle>
