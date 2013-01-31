@@ -288,8 +288,8 @@ class TestInventory(InventoryAPITestCase):
   def test_SimulationMovementisAccountable(self):
     """Test Simulation Movements are not accountable if related to a delivery.
     """
-    sim_mvt = self._makeSimulationMovement(quantity=100)
-    mvt = self._makeMovement(quantity=100)
+    sim_mvt = self._makeSimulationMovement(quantity=2)
+    mvt = self._makeMovement(quantity=3)
     # simulation movement are accountable,
     self.failUnless(sim_mvt.isAccountable())
     # unless connected to a delivery movement
@@ -297,8 +297,10 @@ class TestInventory(InventoryAPITestCase):
     self.failIf(sim_mvt.isAccountable())
     # not accountable movement are not counted by getInventory
     self.tic() # (after reindexing of course)
-    self.assertInventoryEquals(100, section_uid=self.section.getUid())
-  
+    self.assertInventoryEquals(2, section_uid=self.section.getUid())
+    # unless you pass only_accountable=False
+    self.assertInventoryEquals(5, section_uid=self.section.getUid(), only_accountable=False)
+
   def test_OmitSimulation(self):
     """Test omit_simulation argument to getInventory.
     """
