@@ -3,7 +3,7 @@
  <key>career_skill_id | category,catalog,catalog/id/z_related_career_skill</key>
  <key>career_skill_title | category,catalog,catalog/title/z_related_career_skill</key>
  <key>children_reference | catalog/reference/z_related_children</key>
- <key>deliveryLineType | movement,catalog/portal_type/z_related_uid_or_parent_uid</key>
+ <key>deliveryLineType | stock,catalog/portal_type/z_related_uid_or_parent_uid</key>
  <key>explanation_portal_type | stock,catalog/portal_type/z_related_explanation</key>
  <key>explanation_simulation_state | stock,catalog/simulation_state/z_related_explanation</key>
  <key>grand_grand_grand_grand_grand_parent_simulation_state | catalog,catalog,catalog,catalog,catalog,catalog/simulation_state/z_related_grand_grand_grand_grand_grand_parent</key>
