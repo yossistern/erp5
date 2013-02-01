@@ -297,7 +297,7 @@ class TestInventory(InventoryAPITestCase):
     self.failIf(sim_mvt.isAccountable())
     # not accountable movement are not counted by getInventory
     self.tic() # (after reindexing of course)
-    self.assertInventoryEquals(2, section_uid=self.section.getUid())
+    self.assertInventoryEquals(3, section_uid=self.section.getUid())
     # unless you pass only_accountable=False
     self.assertInventoryEquals(5, section_uid=self.section.getUid(), only_accountable=False)
 
@@ -1803,7 +1803,25 @@ class TestMovementHistoryList(InventoryAPITestCase):
                                     omit_simulation=1)
     self.assertEquals(1, len(movement_history_list))
     self.assertEquals(100, movement_history_list[0].quantity)
-  
+
+  def test_OnlyAccountable(self):
+    """Test that only_accountable works with getMovementHistoryList"""
+    getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
+    self._makeMovement(quantity=2)
+    self._makeMovement(quantity=3, is_accountable=False)
+    # by default, only accountable movements are returned
+    movement_history_list = getMovementHistoryList(
+                                    section_uid=self.section.getUid(),)
+    self.assertEquals(1, len(movement_history_list))
+    self.assertEquals(2, movement_history_list[0].quantity)
+    # unless only_accountable=False is passed
+    movement_history_list = getMovementHistoryList(
+                                    section_uid=self.section.getUid(),
+                                    only_accountable=False)
+    self.assertEquals(2, len(movement_history_list))
+    self.assertEquals(sorted((2,3)), sorted(
+      brain.quantity for brain in movement_history_list))
+
   def test_RunningTotalQuantity(self):
     """Test that a running_total_quantity attribute is set on brains
     """
