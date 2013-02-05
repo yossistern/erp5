@@ -283,6 +283,10 @@ class NotificationTool(BaseTool):
     if portal_type_list is None:
       portal_type_list = ('Person',)
 
+    if notifier_list is None:
+      # XXX TODO: Use priority_level. Need to implement default notifier query system.
+      # XXX       For now, we use 'Mail Message'.
+      notifier_list = ['Mail Message']
     if not isinstance(notifier_list, (tuple, list)):
       raise TypeError("Notifier list must be a list of portal types")
 
@@ -337,10 +341,6 @@ class NotificationTool(BaseTool):
     # Make event
     available_notifier_list = self.getNotifierList()
     event_list = []
-    if notifier_list is None:
-      # XXX TODO: Use priority_level. Need to implement default notifier query system.
-      # XXX       For now, we use 'Mail Message'.
-      notifier_list = ['Mail Message']
     if event_keyword_argument_dict is None:
       event_keyword_argument_dict = {}
     for notifier in notifier_list:
