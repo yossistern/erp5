@@ -116,7 +116,8 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         if hasLineContent: return sum of lines total price
         if hasCellContent: return sum of cells total price
         else: return quantity * price
-        if fast is argument true, then a SQL method will be used.
+
+        fast argument is deprecated and ignored.
       """
       if self.hasLineContent():
         meta_type = self.meta_type
@@ -124,8 +125,6 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
                    for l in self.objectValues() if l.meta_type==meta_type)
       elif not self.hasCellContent(base_id='movement'):
         return Movement._getTotalPrice(self, default=default, context=context)
-      elif fast: # Use MySQL
-        return self.DeliveryLine_zGetTotal()[0].total_price or 0.0
       return sum(cell.getTotalPrice(default=0.0, context=context)
                  for cell in self.getCellValueList())
 
@@ -138,7 +137,8 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         if hasLineContent: return sum of lines total quantity
         if hasCellContent: return sum of cells total quantity
         else: return quantity
-        if fast argument is true, then a SQL method will be used.
+
+        fast argument is deprecated and ignored.
       """
       base_id = 'movement'
       if self.hasLineContent():
@@ -146,9 +146,6 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         return sum(l.getTotalQuantity() for l in
             self.objectValues() if l.meta_type==meta_type)
       elif self.hasCellContent(base_id=base_id):
-        if fast : # Use MySQL
-          aggregate = self.DeliveryLine_zGetTotal()[0]
-          return aggregate.total_quantity or 0.0
         return sum([cell.getQuantity() for cell in self.getCellValueList()])
       else:
         return self.getQuantity()
