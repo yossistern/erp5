@@ -57,7 +57,7 @@ params = portal.ERP5Accounting_getParams(selection_name=selection_name)\n
 getSelectionDomainDictFor = context.portal_selections.getSelectionDomainDictFor\n
 \n
 if asset_price:\n
-  getInventoryAssetPrice = portal.portal_simulation.getInventoryAssetPrice\n
+  getInventory = portal.portal_simulation.getInventoryAssetPrice\n
 else:\n
   getInventory = portal.portal_simulation.getInventory\n
 \n
