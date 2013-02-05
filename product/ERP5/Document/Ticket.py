@@ -79,4 +79,4 @@ class Ticket(Project):
     def isAccountable(self):
       """Tickets are accountable.
       """
-      return 1
+      return True

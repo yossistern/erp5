@@ -106,7 +106,7 @@ class SupplyLine(Path, Amount, XMLMatrix):
     def isAccountable(self):
       """Supply Line are not accounted.
       """
-      return 0
+      return False
 
     security.declareProtected(Permissions.AccessContentsInformation,
                               'getDefaultPrice')

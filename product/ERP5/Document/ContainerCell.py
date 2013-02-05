@@ -62,13 +62,10 @@ class ContainerCell(DeliveryCell):
     security.declareProtected(Permissions.AccessContentsInformation,
                               'isAccountable')
     def isAccountable(self):
-      """
-        Returns 1 if this needs to be accounted
-        Only account movements which are not associated to a delivery
-        Whenever delivery is there, delivery has priority
+      """Returns True if this needs to be accounted
       """
       # Never accountable
-      return 0
+      return False
 
     security.declareProtected(Permissions.AccessContentsInformation, 'isDivergent')
     def isDivergent(self):

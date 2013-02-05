@@ -69,4 +69,6 @@ class PaySheetLine(InvoiceLine):
     security.declareProtected(Permissions.AccessContentsInformation,
                               'isAccountable')
     def isAccountable(self):
-      return 1
+      """Paysheet lines are accountable"""
+      # XXX really ?
+      return True
