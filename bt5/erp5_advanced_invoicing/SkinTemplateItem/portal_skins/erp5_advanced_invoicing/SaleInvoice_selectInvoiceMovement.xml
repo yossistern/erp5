@@ -66,7 +66,7 @@ return context.portal_catalog(**kw)\n
         </item>
         <item>
             <key> <string>_params</string> </key>
-            <value> <string>**kw</string> </value>
+            <value> <string>src__=0, **kw</string> </value>
         </item>
         <item>
             <key> <string>id</string> </key>
