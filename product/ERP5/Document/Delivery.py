@@ -92,14 +92,28 @@ class Delivery(XMLObject, ImmobilisationDelivery, SimulableMixin,
     def getTotalPrice(self, fast=0, src__=0, base_contribution=None, rounding=False, **kw):
       """ Returns the total price for this order
 
-        base_contribution must be a relative url of a category.
+        if the `fast` argument is set to a true value, then it use
+        SQLCatalog to compute the price, otherwise it sums the total
+        price of objects one by one.
 
-        fast argument is deprecated and ignored.
+        So if the order is not in the catalog, getTotalPrice(fast=1)
+        will return 0, this is not a bug.
+
+        base_contribution must be a relative url of a category. If passed, then
+        fast parameter is ignored.
       """
       result = None
       kw.setdefault( 'portal_type',
                      self.getPortalDeliveryMovementTypeList())
       if base_contribution is None:
+        if fast:
+          # XXX fast ignores base_contribution for now, but it should be possible
+          # to use a related key
+          kw['section_uid'] = self.getDestinationSectionUid()
+          kw['stock.explanation_uid'] = self.getUid()
+          return self.getPortalObject()\
+            .portal_simulation.getInventoryAssetPrice(**kw)
+
         result = sum([ line.getTotalPrice(fast=0) for line in
                        self.objectValues(**kw) ])
       else:
@@ -154,10 +168,19 @@ class Delivery(XMLObject, ImmobilisationDelivery, SimulableMixin,
     def getTotalQuantity(self, fast=0, src__=0, **kw):
       """ Returns the total quantity of this order.
 
-        fast argument is deprecated and ignored.
+        if the `fast` argument is set to a true value, then it use
+        SQLCatalog to compute the quantity, otherwise it sums the total
+        quantity of objects one by one.
+
+        So if the order is not in the catalog, getTotalQuantity(fast=1)
+        will return 0, this is not a bug.
       """
       kw.setdefault('portal_type',
                     self.getPortalDeliveryMovementTypeList())
+      if fast:
+        kw['section_uid'] = self.getDestinationSectionUid()
+        kw['stock.explanation_uid'] = self.getUid()
+        return self.getPortalObject().portal_simulation.getInventory(**kw)
       return sum([ line.getTotalQuantity(fast=0) for line in
                       self.objectValues(**kw) ])
 

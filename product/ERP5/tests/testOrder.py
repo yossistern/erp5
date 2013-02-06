@@ -740,7 +740,7 @@ class TestOrderMixin(SubcontentReindexingWrapper):
     order_line_list = map(lambda x: x.getObject(), order_line_list)
     total_price = 0
     for order_line in order_line_list:
-      total_price += order_line.getTotalPrice(fast=0)
+      total_price += order_line.getTotalPrice()
     self.assertEquals(0, len(portal_catalog(relative_url=order.getRelativeUrl())))
     self.assertEquals(total_price, order.getTotalPrice(fast=0))
     self.assertNotEquals(total_price, 0)
@@ -1152,7 +1152,12 @@ class TestOrderMixin(SubcontentReindexingWrapper):
                                              'adopt_prevision_action')
 
   non_variated_order_creation = '\
+      stepCreateOrganisation1 \
+      stepCreateOrganisation2 \
+      stepCreateProject1 \
+      stepCreateProject2 \
       stepCreateOrder \
+      stepSetOrderProfile \
       stepCreateNotVariatedResource \
       stepCreateOrderLine \
       stepCheckOrderLineEmptyMatrix \
@@ -1162,7 +1167,12 @@ class TestOrderMixin(SubcontentReindexingWrapper):
       '
 
   variated_order_line_creation = '\
+      stepCreateOrganisation1 \
+      stepCreateOrganisation2 \
+      stepCreateProject1 \
+      stepCreateProject2 \
       stepCreateOrder \
+      stepSetOrderProfile \
       stepCreateVariatedResource \
       stepCreateOrderLine \
       '
@@ -1594,7 +1604,12 @@ class TestOrder(TestOrderMixin, ERP5TypeTestCase):
     sequence_list = SequenceList()
     # Test with positive price order line and negative price order line.
     sequence_string = '\
+                      stepCreateOrganisation1 \
+                      stepCreateOrganisation2 \
+                      stepCreateProject1 \
+                      stepCreateProject2 \
                       stepCreateOrder \
+                      stepSetOrderProfile \
                       stepCheckOrderTotalQuantity \
                       stepCreateNotVariatedResource \
                       stepCreateOrderLine \

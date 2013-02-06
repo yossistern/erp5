@@ -116,9 +116,16 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         if hasLineContent: return sum of lines total price
         if hasCellContent: return sum of cells total price
         else: return quantity * price
-
-        fast argument is deprecated and ignored.
+        if fast argument is true, inventory API will be used.
       """
+      if fast:
+        kw = {}
+        kw['section_uid'] = self.getDestinationSectionUid()
+        kw['stock.explanation_uid'] = self.getExplanationUid()
+        kw['relative_url'] = ( '%s/%%' % self.getRelativeUrl(),
+                               self.getRelativeUrl() )
+        kw['only_accountable'] = False
+        return self.getPortalObject().portal_simulation.getInventoryAssetPrice(**kw)
       if self.hasLineContent():
         meta_type = self.meta_type
         return sum(l.getTotalPrice(context=context)
@@ -137,9 +144,18 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         if hasLineContent: return sum of lines total quantity
         if hasCellContent: return sum of cells total quantity
         else: return quantity
-
-        fast argument is deprecated and ignored.
+        if fast argument is true, inventory API will be used.
       """
+
+      if fast:
+        kw = {}
+        kw['section_uid'] = self.getDestinationSectionUid()
+        kw['stock.explanation_uid'] = self.getExplanationUid()
+        kw['relative_url'] = ( '%s/%%' % self.getRelativeUrl(),
+                               self.getRelativeUrl() )
+        kw['only_accountable'] = False
+        return self.getPortalObject().portal_simulation.getInventory(**kw)
+
       base_id = 'movement'
       if self.hasLineContent():
         meta_type = self.meta_type
@@ -147,8 +163,7 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
             self.objectValues() if l.meta_type==meta_type)
       elif self.hasCellContent(base_id=base_id):
         return sum([cell.getQuantity() for cell in self.getCellValueList()])
-      else:
-        return self.getQuantity()
+      return self.getQuantity()
 
     security.declareProtected(Permissions.AccessContentsInformation,
                               'hasLineContent')
