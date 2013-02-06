@@ -357,19 +357,30 @@ class TestOrderMixin(SubcontentReindexingWrapper):
 
   def stepCheckOrder(self, sequence=None, sequence_list=None, **kw):
     """
-      Check if order was well created
+      Check if order was well created, either by stepCreateOrder of
+      stepSetOrderProfile
     """
-    organisation = sequence.get('organisation')
-    project = sequence.get('project')
+    source_organisation = sequence.get('organisation1')
+    if source_organisation is None:
+      source_organisation = sequence.get('organisation')
+    destination_organisation = sequence.get('organisation2')
+    if destination_organisation is None:
+      destination_organisation = sequence.get('organisation')
+    source_project = sequence.get('project1')
+    if source_project is None:
+      source_project = sequence.get('project')
+    destination_project = sequence.get('project2')
+    if destination_project is None:
+      destination_project = sequence.get('project')
     order = sequence.get('order')
     self.assertEquals(self.datetime+10, order.getStartDate())
     self.assertEquals(self.datetime+20, order.getStopDate())
-    self.assertEquals(organisation, order.getSourceValue())
-    self.assertEquals(organisation, order.getDestinationValue())
-    self.assertEquals(organisation, order.getSourceSectionValue())
-    self.assertEquals(organisation, order.getDestinationSectionValue())
-    self.assertEquals(project, order.getSourceProjectValue())
-    self.assertEquals(project, order.getDestinationProjectValue())
+    self.assertEquals(source_organisation, order.getSourceValue())
+    self.assertEquals(destination_organisation, order.getDestinationValue())
+    self.assertEquals(source_organisation, order.getSourceSectionValue())
+    self.assertEquals(destination_organisation, order.getDestinationSectionValue())
+    self.assertEquals(source_project, order.getSourceProjectValue())
+    self.assertEquals(destination_project, order.getDestinationProjectValue())
 
 
   def stepCreateOrderLine(self,sequence=None, sequence_list=None, **kw):
@@ -2269,11 +2280,15 @@ class TestOrder(TestOrderMixin, ERP5TypeTestCase):
     """
     if not run: return
 
-    portal = self.getPortal()
+    portal = self.portal
     base_id = 'movement'
     order_line_vcl=['size/Baby']
+    section = portal.organisation_module.newContent(
+      portal_type='Organisation')
     order_module = portal.getDefaultModule(portal_type=self.order_portal_type)
     order = order_module.newContent(portal_type=self.order_portal_type,
+                                    destination_section_value=section,
+                                    destination_value=section,
                                     specialise=self.business_process)
     # No line, no movement
     self.assertEquals(order.getTotalQuantity(fast=0), 0)
