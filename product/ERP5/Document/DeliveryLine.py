@@ -123,8 +123,8 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         kw['section_uid'] = self.getDestinationSectionUid()
         kw['stock.explanation_uid'] = self.getExplanationUid()
         kw['relative_url'] = ( '%s/%%' % (
-          self.getRelativeUrl().replace('_', '\\_'),
-          self.getRelativeUrl() ))
+          self.getRelativeUrl().replace('_', '\\_')),
+          self.getRelativeUrl() )
         kw['only_accountable'] = False
         return self.getPortalObject().portal_simulation.getInventoryAssetPrice(**kw)
       if self.hasLineContent():
@@ -153,8 +153,8 @@ class DeliveryLine(Movement, XMLObject, XMLMatrix, ImmobilisationMovement):
         kw['section_uid'] = self.getDestinationSectionUid()
         kw['stock.explanation_uid'] = self.getExplanationUid()
         kw['relative_url'] = ( '%s/%%' % (
-          self.getRelativeUrl().replace('_', '\\_'),
-          self.getRelativeUrl() ))
+          self.getRelativeUrl().replace('_', '\\_')),
+          self.getRelativeUrl() )
         kw['only_accountable'] = False
         return self.getPortalObject().portal_simulation.getInventory(**kw)
 
