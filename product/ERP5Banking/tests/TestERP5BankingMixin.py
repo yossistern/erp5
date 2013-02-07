@@ -793,7 +793,7 @@ class TestERP5BankingMixin(ERP5TypeTestCase):
     catalog = self.portal.portal_catalog.getSQLCatalog()
     for zsql in ["z0_drop_movement", "z0_uncatalog_movement",
                  "z_catalog_movement_list", "z_create_movement", ]:
-      if catalog._getObj(zsql, None) is not None:
+      if catalog._getOb(zsql, None) is not None:
         catalog.manage_delObjects(ids=[zsql])
 
     # Update properties of catalog
