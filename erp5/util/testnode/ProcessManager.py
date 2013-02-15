@@ -99,21 +99,26 @@ def subprocess_capture(p, log, log_prefix, get_output=True):
   return (p.stdout and ''.join(stdout),
           p.stderr and ''.join(stderr))
 
-def killCommand(pid):
+def killCommand(pid, log):
   """
   To avoid letting orphaned childs, we stop the process and all it's
   child (until childs does not change) and then we brutally kill
   everyone at the same time
   """
   process = psutil.Process(pid)
-  child_set = set([x.pid for x in process.get_children(recursive=True)])
-  new_child_set = None
+  new_child_set = set([x.pid for x in process.get_children(recursive=True)])
+  child_set = None
   os.kill(pid, signal.SIGSTOP)
   while new_child_set != child_set:
+    child_set = new_child_set
+    log("killCommand, new_child_set : %r, child_set: %r" % (
+        new_child_set, child_set))
     for child_pid in child_set:
       os.kill(child_pid, signal.SIGSTOP)
     time.sleep(1)
+    child_set = new_child_set
     new_child_set = set([x.pid for x in process.get_children(recursive=True)])
+  log("killCommand, finishing, child_set : %r" % (child_set,))
   for child_pid in child_set:
     os.kill(child_pid, signal.SIGKILL)
   os.kill(pid, signal.SIGKILL)
@@ -130,18 +135,22 @@ class ProcessManager(object):
     self.p = None
     self.result = None
     self.max_timeout = kw.get("max_timeout") or MAX_TIMEOUT
+    self.timer_set = set()
 
   def spawn(self, *args, **kw):
     def timeoutExpired(p, log):
       if p.poll() is None:
         log('PROCESS TOO LONG OR DEAD, GOING TO BE TERMINATED')
-        killCommand(p.pid)
+        killCommand(p.pid, log)
 
     if self.under_cancellation:
       raise CancellationError("Test Result was cancelled")
     get_output = kw.pop('get_output', True)
     log_prefix = kw.pop('log_prefix', '')
     new_session = kw.pop('new_session', True)
+    log = kw.pop('log', None)
+    if log is None:
+      log = self.log
     subprocess_kw = {}
     cwd = kw.pop('cwd', None)
     if cwd:
@@ -151,17 +160,19 @@ class ProcessManager(object):
     raise_error_if_fail = kw.pop('raise_error_if_fail', True)
     env = kw and dict(os.environ, **kw) or None
     command = format_command(*args, **kw)
-    self.log('subprocess_kw : %r' % (subprocess_kw,))
-    self.log('$ ' + command)
+    log('subprocess_kw : %r' % (subprocess_kw,))
+    log('$ ' + command)
     sys.stdout.flush()
     p = subprocess.Popen(args, stdin=self.stdin, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, env=env, **subprocess_kw)
     self.process_pid_set.add(p.pid)
-    timer = threading.Timer(self.max_timeout, timeoutExpired, args=(p, self.log))
+    timer = threading.Timer(self.max_timeout, timeoutExpired, args=(p, log))
+    self.timer_set.add(timer)
     timer.start()
-    stdout, stderr = subprocess_capture(p, self.log, log_prefix,
+    stdout, stderr = subprocess_capture(p, log, log_prefix,
                                         get_output=get_output)
     timer.cancel()
+    self.timer_set.discard(timer)
     result = dict(status_code=p.returncode, command=command,
                   stdout=stdout, stderr=stderr)
     self.process_pid_set.discard(p.pid)
@@ -181,9 +192,11 @@ class ProcessManager(object):
     self.log('ProcessManager killPreviousRun, going to kill %r' % (self.process_pid_set,))
     if cancellation:
       self.under_cancellation = True
+    for timer in self.timer_set:
+      timer.cancel()
     for pgpid in self.process_pid_set:
       try:
-        killCommand(pgpid)
+        killCommand(pgpid, self.log)
       except:
         pass
     try:

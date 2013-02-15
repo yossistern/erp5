@@ -1,6 +1,51 @@
 Changes
 =======
 
+0.4.27 (2013-02-15)
+-------------------
+
+ * erp5.util.testnode:
+
+  - testnode was still sometimes logging at several files at a time
+    [Sebastien Robin]
+
+0.4.26 (2013-02-14)
+-------------------
+
+ * erp5.util.testnode:
+
+  - do not reraise OSError when cleaning temp files
+
+0.4.25 (2013-02-11)
+-------------------
+
+ * erp5.util.testnode:
+
+  - close all timers when quitting, this makes stopping an erp5tetsnode
+    much faster [Sebastien Robin]
+  - remove hack on slapos/testnode after fix of slapos.cookbook [Sebastien Robin]
+  - remove old tmp files left by buildout (buildout has te bo fixed too)
+    [Sebastien Robin]
+  - remove logging handlers where the are not needed any more [Sebastien Robin]
+  - fixed the kill command, it was not able to kill properly childs [Sebastien Robin]
+
+0.4.24 (2013-02-11)
+-------------------
+
+ * erp5.util.testnode:
+
+  - Fixed wrong location for the construction os test suite software
+    [Sebastien Robin]
+
+0.4.23 (2013-02-11)
+-------------------
+
+ * erp5.util.testnode:
+
+  - Make erp5testnode allow remote access to test suite logs instead of
+    uploading them to master [Tatuya Kamada], [Sebastien Robin]
+
+
 0.4.22 (2013-01-08)
 -------------------
 

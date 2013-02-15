@@ -34,12 +34,18 @@ import SlapOSControler
 import json
 import time
 import shutil
+import logging
+import string
+import random
 from ProcessManager import SubprocessError, ProcessManager, CancellationError
 from subprocess import CalledProcessError
 from Updater import Updater
 from erp5.util import taskdistribution
 
 DEFAULT_SLEEP_TIMEOUT = 120 # time in seconds to sleep
+MAX_LOG_TIME = 15 # time in days we should keep logs that we can see through
+                  # httd
+MAX_TEMP_TIME = 5 # time in days we should keep temp files
 supervisord_pid_file = None
 
 PROFILE_PATH_KEY = 'profile_path'
@@ -106,17 +112,33 @@ class NodeTestSuite(SlapOSInstance):
         vcs_repository['repository_id'] = repository_id
         vcs_repository['repository_path'] = repository_path
 
+  def createSuiteLog(self):
+    # /srv/slapgrid/slappartXX/srv/var/log/testnode/az-mlksjfmlk234Sljssdflkj23KSdfslj/suite.log
+    alphabets = string.digits + string.letters
+    rand_part = ''.join(random.choice(alphabets) for i in xrange(32))
+    random_suite_folder_id = '%s-%s' % (self.reference, rand_part)
+    suite_log_directory = os.path.join(self.log_directory,
+                                       random_suite_folder_id)
+    SlapOSControler.createFolders(suite_log_directory)
+    self.suite_log_path = os.path.join(suite_log_directory,
+                                       'suite.log')
+    return self.getSuiteLogPath(), random_suite_folder_id
+
+  def getSuiteLogPath(self):
+    return getattr(self,"suite_log_path", None)
+
 class TestNode(object):
 
-  def __init__(self, log, config):
+  def __init__(self, log, config, max_log_time=MAX_LOG_TIME,
+               max_temp_time=MAX_TEMP_TIME):
+    self.testnode_log = log
     self.log = log
     self.config = config or {}
     self.process_manager = ProcessManager(log)
     self.node_test_suite_dict = {}
-    # hack until slapos.cookbook is updated
-    if self.config.get('working_directory', '').endswith("slapos/"):
-      self.config['working_directory'] = self.config[
-        'working_directory'][:-(len("slapos/"))] + "testnode"
+    self.max_log_time = max_log_time
+    self.max_temp_time = max_temp_time
+    self.file_handler = None
 
   def checkOldTestSuite(self,test_suite_data):
     config = self.config
@@ -206,19 +228,43 @@ branch = %(branch)s
     node_test_suite.revision = ','.join(full_revision_list)
     return full_revision_list
 
-  def addWatcher(self,test_result):
-    config = self.config
-    if config.get('log_file'):
-     log_file_name = config['log_file']
-     log_file = open(log_file_name)
-     log_file.seek(0, 2)
-     log_file.seek(-min(5000, log_file.tell()), 2)
-     test_result.addWatch(log_file_name,log_file,max_history_bytes=10000)
-     return log_file_name
+  def registerSuiteLog(self, test_result, node_test_suite):
+    """
+      Create a log dedicated for the test suite,
+      and register the url to master node.
+    """
+    suite_log_path, folder_id = node_test_suite.createSuiteLog()
+    self._initializeSuiteLog(suite_log_path)
+    # TODO make the path into url
+    test_result.reportStatus('LOG url', "%s/%s" % (self.config.get('httpd_url'),
+                             folder_id), '')
+    self.log("going to switch to log %r" % suite_log_path)
+    self.process_manager.log = self.log = self.getSuiteLog()
+    return suite_log_path
+
+  def getSuiteLog(self):
+    return self.suite_log
+
+  def _initializeSuiteLog(self, suite_log_path):
+    # remove previous handlers
+    logger = logging.getLogger('testsuite')
+    if self.file_handler is not None:
+      logger.removeHandler(self.file_handler)
+    # and replace it with new handler
+    logger_format = '%(asctime)s %(name)-13s: %(levelname)-8s %(message)s'
+    formatter = logging.Formatter(logger_format)
+    logging.basicConfig(level=logging.INFO, format=logger_format)
+    self.file_handler = logging.FileHandler(filename=suite_log_path)
+    self.file_handler.setFormatter(formatter)
+    logger.addHandler(self.file_handler)
+    logger.info('Activated logfile %r output' % suite_log_path)
+    self.suite_log = logger.info
 
   def checkRevision(self, test_result, node_test_suite):
     config = self.config
     log = self.log
+    if log is None:
+      log = self.log
     if node_test_suite.revision != test_result.revision:
      log('Disagreement on tested revision, checking out: %r' % (
           (node_test_suite.revision,test_result.revision),))
@@ -235,19 +281,19 @@ branch = %(branch)s
       updater.checkout()
       node_test_suite.revision = test_result.revision
 
-  def _prepareSlapOS(self, working_directory, slapos_instance,
+  def _prepareSlapOS(self, working_directory, slapos_instance, log,
           create_partition=1, software_path_list=None, **kw):
     """
     Launch slapos to build software and partitions
     """
     slapproxy_log = os.path.join(self.config['log_directory'],
                                   'slapproxy.log')
-    self.log('Configured slapproxy log to %r' % slapproxy_log)
+    log('Configured slapproxy log to %r' % slapproxy_log)
     reset_software = slapos_instance.retry_software_count > 10
-    self.log('testnode, retry_software_count : %r' % \
+    log('testnode, retry_software_count : %r' % \
              slapos_instance.retry_software_count)
     self.slapos_controler = SlapOSControler.SlapOSControler(
-      working_directory, self.config, self.log)
+      working_directory, self.config, log)
     self.slapos_controler.initializeSlapOSControler(slapproxy_log=slapproxy_log,
        process_manager=self.process_manager, reset_software=reset_software,
        software_path_list=software_path_list)
@@ -275,12 +321,15 @@ branch = %(branch)s
     like the building of selenium-runner by default
     """
     return self._prepareSlapOS(self.config['slapos_directory'],
-              test_node_slapos, create_partition=0,
+              test_node_slapos, self.log, create_partition=0,
               software_path_list=self.config.get("software_list"))
 
   def prepareSlapOSForTestSuite(self, node_test_suite):
+    log = self.log
+    if log is None:
+      log = self.log
     return self._prepareSlapOS(node_test_suite.working_directory,
-              node_test_suite,
+              node_test_suite, log,
               software_path_list=[node_test_suite.custom_profile_path])
 
   def _dealShebang(self,run_test_suite_path):
@@ -290,7 +339,7 @@ branch = %(branch)s
       invocation_list = line[2:].split()
     return invocation_list
 
-  def runTestSuite(self, node_test_suite, portal_url):
+  def runTestSuite(self, node_test_suite, portal_url, log=None):
     config = self.config
     parameter_list = []
     run_test_suite_path_list = glob.glob("%s/*/bin/runTestSuite" % \
@@ -333,15 +382,47 @@ branch = %(branch)s
                           cwd=node_test_suite.test_suite_directory,
                           log_prefix='runTestSuite', get_output=False)
 
+  def _cleanupLog(self):
+    config = self.config
+    log_directory = self.config['log_directory']
+    now = time.time()
+    for log_folder in os.listdir(log_directory):
+      folder_path = os.path.join(log_directory, log_folder)
+      if os.path.isdir(folder_path):
+        if (now - os.stat(folder_path).st_mtime)/86400 > self.max_log_time:
+          self.log("deleting log directory %r" % (folder_path,))
+          shutil.rmtree(folder_path)
+
+  def _cleanupTemporaryFiles(self):
+    """
+    buildout seems letting files under /tmp. To avoid regular error of
+    missing disk space, remove old logs
+    """
+    temp_directory = self.config["system_temp_folder"]
+    now = time.time()
+    user_id = os.geteuid()
+    for temp_folder in os.listdir(temp_directory):
+      folder_path = os.path.join(temp_directory, temp_folder)
+      if (temp_folder.startswith("tmp") or
+          temp_folder.startswith("buildout")):
+        try:
+          stat = os.stat(folder_path)
+          if stat.st_uid == user_id and \
+              (now - stat.st_mtime)/86400 > self.max_temp_time:
+            self.log("deleting temp directory %r" % (folder_path,))
+            if os.path.isdir(folder_path):
+              shutil.rmtree(folder_path)
+            else:
+              os.remove(folder_path)
+        except OSError:
+          self.log("_cleanupTemporaryFiles exception", exc_info=sys.exc_info())
+
   def cleanUp(self,test_result):
     log = self.log
     log('Testnode.cleanUp')
     self.process_manager.killPreviousRun()
-    if test_result is not None:
-      try:
-        test_result.removeWatch(self.config['log_file'])
-      except KeyError:
-        log("KeyError, Watcher already deleted or not added correctly")
+    self._cleanupLog()
+    self._cleanupTemporaryFiles()
 
   def run(self):
     log = self.log
@@ -355,6 +436,7 @@ branch = %(branch)s
     try:
       while True:
         try:
+          self.log = self.process_manager.log = self.testnode_log
           self.cleanUp(None)
           remote_test_result_needs_cleanup = False
           begin = time.time()
@@ -373,7 +455,8 @@ branch = %(branch)s
             node_test_suite = self.getNodeTestSuite(
                test_suite["test_suite_reference"])
             node_test_suite.edit(
-               working_directory=self.config['working_directory'])
+               working_directory=self.config['working_directory'],
+               log_directory=self.config['log_directory'])
             node_test_suite.edit(**test_suite)
             run_software = True
             # Write our own software.cfg to use the local repository
@@ -389,7 +472,7 @@ branch = %(branch)s
             remote_test_result_needs_cleanup = True
             log("testnode, test_result : %r" % (test_result, ))
             if test_result is not None:
-              log_file_name = self.addWatcher(test_result)
+              self.registerSuiteLog(test_result, node_test_suite)
               self.checkRevision(test_result,node_test_suite)
               # Now prepare the installation of SlapOS and create instance
               status_dict = self.prepareSlapOSForTestSuite(node_test_suite)
@@ -398,7 +481,6 @@ branch = %(branch)s
               # a reliable way to check if they are up or not ...
               time.sleep(20)
               self.runTestSuite(node_test_suite,portal_url)
-              test_result.removeWatch(log_file_name)
               # break the loop to get latest priorities from master
               break
             self.cleanUp(test_result)
@@ -430,9 +512,12 @@ branch = %(branch)s
           sleep_time = 120 - (now-begin)
           log("End of processing, going to sleep %s" % sleep_time)
           time.sleep(sleep_time)
+    except:
+      log("Exception in error handling", exc_info=sys.exc_info())
     finally:
       # Nice way to kill *everything* generated by run process -- process
       # groups working only in POSIX compilant systems
       # Exceptions are swallowed during cleanup phas
       log("GENERAL EXCEPTION, QUITING")
       self.cleanUp(test_result)
+      log("GENERAL EXCEPTION, QUITING, cleanup finished")
