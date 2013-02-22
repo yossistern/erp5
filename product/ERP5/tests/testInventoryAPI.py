@@ -288,8 +288,8 @@ class TestInventory(InventoryAPITestCase):
   def test_SimulationMovementisAccountable(self):
     """Test Simulation Movements are not accountable if related to a delivery.
     """
-    sim_mvt = self._makeSimulationMovement(quantity=100)
-    mvt = self._makeMovement(quantity=100)
+    sim_mvt = self._makeSimulationMovement(quantity=2)
+    mvt = self._makeMovement(quantity=3)
     # simulation movement are accountable,
     self.failUnless(sim_mvt.isAccountable())
     # unless connected to a delivery movement
@@ -297,8 +297,10 @@ class TestInventory(InventoryAPITestCase):
     self.failIf(sim_mvt.isAccountable())
     # not accountable movement are not counted by getInventory
     self.tic() # (after reindexing of course)
-    self.assertInventoryEquals(100, section_uid=self.section.getUid())
-  
+    self.assertInventoryEquals(3, section_uid=self.section.getUid())
+    # unless you pass only_accountable=False
+    self.assertInventoryEquals(5, section_uid=self.section.getUid(), only_accountable=False)
+
   def test_OmitSimulation(self):
     """Test omit_simulation argument to getInventory.
     """
@@ -405,7 +407,73 @@ class TestInventory(InventoryAPITestCase):
             function_category_strict_membership='function/function1')
     self.assertInventoryEquals(100,
             function_category_strict_membership='function/function1/function2')
-  
+
+  def test_Funding(self):
+    """Tests inventory on funding"""
+    self._makeMovement(quantity=30, destination_funding='function/function1')
+    self._makeMovement(quantity=-70, source_funding='function/function1')
+
+    self.assertInventoryEquals(100, funding='function/function1')
+    self.assertInventoryEquals(0, funding='function/function1/function2')
+
+  def test_FundingUid(self):
+    """Tests inventory on funding uid"""
+    function = self.portal.portal_categories.function
+    self._makeMovement(quantity=100, destination_funding='function/function1')
+
+    self.assertInventoryEquals(100, funding_uid=function.function1.getUid())
+    self.assertInventoryEquals(0,
+                            funding_uid=function.function1.function2.getUid())
+
+  def test_FundingCategory(self):
+    """Tests inventory on funding category"""
+    self._makeMovement(quantity=100,
+                       destination_funding='function/function1/function2')
+    self.assertInventoryEquals(100, funding_category='function/function1')
+    self.assertInventoryEquals(100, funding='function/function1/function2')
+
+  def test_FundingCategoryStrictMembership(self):
+    """Tests inventory on funding category strict membership"""
+    self._makeMovement(quantity=100,
+                       destination_funding='function/function1/function2')
+    self.assertInventoryEquals(0,
+            funding_category_strict_membership='function/function1')
+    self.assertInventoryEquals(100,
+            funding_category_strict_membership='function/function1/function2')
+
+  def test_PaymentRequest(self):
+    """Tests inventory on payment_request"""
+    self._makeMovement(quantity=30, destination_payment_request='function/function1')
+    self._makeMovement(quantity=-70, source_payment_request='function/function1')
+
+    self.assertInventoryEquals(100, payment_request='function/function1')
+    self.assertInventoryEquals(0, payment_request='function/function1/function2')
+
+  def test_PaymentRequestUid(self):
+    """Tests inventory on payment_request uid"""
+    function = self.portal.portal_categories.function
+    self._makeMovement(quantity=100, destination_payment_request='function/function1')
+
+    self.assertInventoryEquals(100, payment_request_uid=function.function1.getUid())
+    self.assertInventoryEquals(0,
+                            payment_request_uid=function.function1.function2.getUid())
+
+  def test_PaymentRequestCategory(self):
+    """Tests inventory on payment_request category"""
+    self._makeMovement(quantity=100,
+                       destination_payment_request='function/function1/function2')
+    self.assertInventoryEquals(100, payment_request_category='function/function1')
+    self.assertInventoryEquals(100, payment_request='function/function1/function2')
+
+  def test_PaymentRequestCategoryStrictMembership(self):
+    """Tests inventory on payment_request category strict membership"""
+    self._makeMovement(quantity=100,
+                       destination_payment_request='function/function1/function2')
+    self.assertInventoryEquals(0,
+            payment_request_category_strict_membership='function/function1')
+    self.assertInventoryEquals(100,
+            payment_request_category_strict_membership='function/function1/function2')
+
   def test_Project(self):
     """Tests inventory on project"""
     self._makeMovement(quantity=100, destination_project_value=self.project)
@@ -456,6 +524,23 @@ class TestInventory(InventoryAPITestCase):
     self.tic()
     self.assertInventoryEquals(100,
                 resource_category_strict_membership=['product_line/level1'])
+
+  def test_ResourcePortalType(self):
+    """Tests inventory on resource_portal_type """
+    self._makeMovement(quantity=2, source_value=None)
+    self._makeMovement(quantity=3,
+      source_value=None,
+      resource_value=self.portal.portal_categories.product_line.level1)
+    assert self.resource.portal_type != 'Category'
+    self.assertInventoryEquals(2,
+      resource_portal_type=self.resource.portal_type)
+    self.assertInventoryEquals(3,
+      resource_portal_type='Category')
+    # FIXME: resource_portal_type is an automatically generated related key,
+    # but as movements categories are not cataloged with acquisition, it does
+    # not work for movements acquiring resource from their parents.
+    # One way is to make an explicit resource_portal_type related key that
+    # would use stock.resource_uid (replacing the ugly 'resourceType')
 
   def test_PaymentCategory(self):
     """Tests inventory on payment_category """
@@ -688,6 +773,19 @@ class TestInventory(InventoryAPITestCase):
                             payment_uid=self.other_payment_node.getUid(),
                             omit_input=1)
 
+  def test_OmitInputOmitOutputWithZeroQuantity(self):
+    self._makeMovement(quantity=0, destination_total_asset_price=1)
+    getInventoryAssetPrice = self.portal.portal_simulation.getInventoryAssetPrice
+    self.assertEquals(0, getInventoryAssetPrice(node_uid=self.node.getUid(),
+                                                omit_input=1))
+    self.assertEquals(1, getInventoryAssetPrice(node_uid=self.node.getUid(),
+                                                omit_output=1))
+
+  def test_OmitAssetIncreaseDecreaseWithZeroPrice(self):
+    self._makeMovement(quantity=1, destination_total_asset_price=0)
+    self.assertInventoryEquals(0, node_uid=self.node.getUid(), omit_input=1)
+    self.assertInventoryEquals(1, node_uid=self.node.getUid(), omit_output=1)
+
   def test_TimeZone(self):
     """
     Check that getInventory support DateTime parameter with 
@@ -720,6 +818,15 @@ class TestInventoryList(InventoryAPITestCase):
           [c.__name__ for c in inventory_list._class.__bases__])
     # default is an empty list
     self.assertEquals(0, len(inventory_list))
+
+  def testDefault0(self):
+    getInventoryList = self.getSimulationTool().getInventoryList
+    self._makeMovement()
+    inventory_list = getInventoryList(section_uid=self.section.getUid(),)
+    self.assertEquals(1, len(inventory_list))
+    self.assertEquals(0, inventory_list[0].total_quantity)
+    # The total price of grouped movements without price is 0
+    self.assertEquals(0, inventory_list[0].total_price)
 
   def test_GroupByNode(self):
     getInventoryList = self.getSimulationTool().getInventoryList
@@ -818,6 +925,44 @@ class TestInventoryList(InventoryAPITestCase):
       function1.getUid()][0].inventory, 2)
     self.assertEquals([r for r in inventory_list if r.function_uid ==
       function2.getUid()][0].inventory, 3)
+
+  def test_GroupByFunding(self):
+    getInventoryList = self.getSimulationTool().getInventoryList
+    funding1 = self.portal.portal_categories.restrictedTraverse(
+                                      'function/function1')
+    funding2 = self.portal.portal_categories.restrictedTraverse(
+                                      'function/function1/function2')
+    self._makeMovement(quantity=2,
+                       destination_funding_value=funding1,)
+    self._makeMovement(quantity=3,
+                       destination_funding_value=funding2,)
+
+    inventory_list = getInventoryList(node_uid=self.node.getUid(),
+                                      group_by_funding=1)
+    self.assertEquals(2, len(inventory_list))
+    self.assertEquals([r for r in inventory_list if r.funding_uid ==
+      funding1.getUid()][0].inventory, 2)
+    self.assertEquals([r for r in inventory_list if r.funding_uid ==
+      funding2.getUid()][0].inventory, 3)
+
+  def test_GroupByPaymentRequest(self):
+    getInventoryList = self.getSimulationTool().getInventoryList
+    payment_request1 = self.portal.portal_categories.restrictedTraverse(
+                                      'function/function1')
+    payment_request2 = self.portal.portal_categories.restrictedTraverse(
+                                      'function/function1/function2')
+    self._makeMovement(quantity=2,
+                       destination_payment_request_value=payment_request1,)
+    self._makeMovement(quantity=3,
+                       destination_payment_request_value=payment_request2,)
+
+    inventory_list = getInventoryList(node_uid=self.node.getUid(),
+                                      group_by_payment_request=1)
+    self.assertEquals(2, len(inventory_list))
+    self.assertEquals([r for r in inventory_list if r.payment_request_uid ==
+      payment_request1.getUid()][0].inventory, 2)
+    self.assertEquals([r for r in inventory_list if r.payment_request_uid ==
+      payment_request2.getUid()][0].inventory, 3)
 
   def test_GroupByProject(self):
     getInventoryList = self.getSimulationTool().getInventoryList
@@ -1258,7 +1403,17 @@ class TestMovementHistoryList(InventoryAPITestCase):
                     'Shared.DC.ZRDB.Results.Results')
     # default is an empty list
     self.assertEquals(0, len(mvt_history_list))
-  
+
+  def testDefault0(self):
+    self._makeMovement()
+    getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
+    mvt_history_list = getMovementHistoryList(
+      section_uid=self.section.getUid(),)
+    self.assertEquals(1, len(mvt_history_list))
+    self.assertEquals(0, mvt_history_list[0].total_quantity)
+    # If a movement have no price, None is returned
+    self.assertEquals(None, mvt_history_list[0].total_price)
+
   def testMovementBothSides(self):
     """Movement History List returns movement from both sides""" 
     getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
@@ -1276,7 +1431,23 @@ class TestMovementHistoryList(InventoryAPITestCase):
     self.assertEquals('MovementHistoryListBrain', brain_class,
       "unexpected brain class for getMovementHistoryList InventoryListBrain"
       " != %s (bases %s)" % (brain_class, r_bases))
-  
+
+  def testBrainAttribute(self):
+    """Test attributes exposed on brains."""
+    getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
+    self._makeMovement(quantity=100)
+    brain = getMovementHistoryList()[0]
+    self.assertTrue(hasattr(brain, 'node_uid'))
+    self.assertTrue(hasattr(brain, 'resource_uid'))
+    self.assertTrue(hasattr(brain, 'section_uid'))
+    self.assertTrue(hasattr(brain, 'date'))
+    self.assertTrue(hasattr(brain, 'function_uid'))
+    self.assertTrue(hasattr(brain, 'payment_uid'))
+    self.assertTrue(hasattr(brain, 'project_uid'))
+    self.assertTrue(hasattr(brain, 'funding_uid'))
+    self.assertTrue(hasattr(brain, 'mirror_node_uid'))
+    self.assertTrue(hasattr(brain, 'mirror_section_uid'))
+
   def testSection(self):
     getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
     mvt = self._makeMovement(quantity=100)
@@ -1668,7 +1839,25 @@ class TestMovementHistoryList(InventoryAPITestCase):
                                     omit_simulation=1)
     self.assertEquals(1, len(movement_history_list))
     self.assertEquals(100, movement_history_list[0].quantity)
-  
+
+  def test_OnlyAccountable(self):
+    """Test that only_accountable works with getMovementHistoryList"""
+    getMovementHistoryList = self.getSimulationTool().getMovementHistoryList
+    self._makeMovement(quantity=2)
+    self._makeMovement(quantity=3, is_accountable=False)
+    # by default, only accountable movements are returned
+    movement_history_list = getMovementHistoryList(
+                                    section_uid=self.section.getUid(),)
+    self.assertEquals(1, len(movement_history_list))
+    self.assertEquals(2, movement_history_list[0].quantity)
+    # unless only_accountable=False is passed
+    movement_history_list = getMovementHistoryList(
+                                    section_uid=self.section.getUid(),
+                                    only_accountable=False)
+    self.assertEquals(2, len(movement_history_list))
+    self.assertEquals(sorted((2,3)), sorted(
+      brain.quantity for brain in movement_history_list))
+
   def test_RunningTotalQuantity(self):
     """Test that a running_total_quantity attribute is set on brains
     """

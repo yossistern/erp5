@@ -2226,11 +2226,9 @@ class TestCMFActivity(ERP5TypeTestCase, LogInterceptor):
       self.flushAllActivities(silent=1, loop_size=100)
       self.commit()
       # Check that cmf_activity SQL connection still works
-      connection_da_pool = self.getPortalObject().cmf_activity_sql_connection()
-      import thread
-      connection_da = connection_da_pool._db_pool[thread.get_ident()]
+      connection_da = self.getPortalObject().cmf_activity_sql_connection()
       self.assertFalse(connection_da._registered)
-      connection_da_pool.query('select 1')
+      connection_da.query('select 1')
       self.assertTrue(connection_da._registered)
       self.commit()
       self.assertFalse(connection_da._registered)
@@ -3503,6 +3501,28 @@ class TestCMFActivity(ERP5TypeTestCase, LogInterceptor):
     )
     newconn = portal.cmf_activity_sql_connection
     self.assertEquals(newconn.meta_type, 'CMFActivity Database Connection')
+
+  def test_connection_sortkey(self):
+    """
+    Check that SQL connection has properly initialized sort key,
+    even when its container (ZODB connection) is reused by another thread.
+    """
+    def sortKey():
+      app = ZopeTestCase.app()
+      try:
+        c = app[self.getPortalName()].cmf_activity_sql_connection()
+        return app._p_jar, c.sortKey()
+      finally:
+        ZopeTestCase.close(app)
+    jar, sort_key = sortKey()
+    self.assertNotEqual(1, sort_key)
+    result = []
+    t = threading.Thread(target=lambda: result.extend(sortKey()))
+    t.daemon = True
+    t.start()
+    t.join()
+    self.assertTrue(result[0] is jar)
+    self.assertEqual(result[1], sort_key)
 
   def test_onErrorCallback(self):
     activity_tool = self.portal.portal_activities
