@@ -6682,7 +6682,7 @@ class TestBusinessTemplate(BusinessTemplateMixin):
                         role.getLocalRoleGroupValue())
       path = self.portal.geek_module['1']
       self.assertEquals(sorted([
-        ('another_group', ['Assignee'])
+        ('another_group', ['Assignee']),
         ('group', ['Assignee', 'Assignor']),
         ]), sorted([item for item in
             path.__ac_local_roles__.items() if item[1] != ['Owner']]))
