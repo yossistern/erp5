@@ -6681,11 +6681,11 @@ class TestBusinessTemplate(BusinessTemplateMixin):
       self.assertEquals(self.portal.portal_categories.local_role_group.Alternate,
                         role.getLocalRoleGroupValue())
       path = self.portal.geek_module['1']
-      self.assertEquals([
-        ('group', ['Assignee', 'Assignor']),
+      self.assertEquals(sorted([
         ('another_group', ['Assignee'])
-        ], [item for item in
-            path.__ac_local_roles__.items() if item[1] != ['Owner']])
+        ('group', ['Assignee', 'Assignor']),
+        ]), sorted([item for item in
+            path.__ac_local_roles__.items() if item[1] != ['Owner']]))
       self.assertEquals(initial___ac_local_roles_group_id_dict__,
         path.__ac_local_roles_group_id_dict__)
       # make sure we can reindexing the object works
