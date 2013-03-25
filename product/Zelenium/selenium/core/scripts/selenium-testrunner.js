@@ -313,7 +313,7 @@ objectExtend(HtmlTestRunnerControlPanel.prototype, {
     initialize: function() {
         this._acquireQueryString();
 
-        this.runInterval = 0;
+        this.runInterval = 0; 
 
         this.highlightOption = sel$('highlightOption');
         this.pauseButton = sel$('pauseTest');
@@ -367,7 +367,7 @@ objectExtend(HtmlTestRunnerControlPanel.prototype, {
     },
 
     reset: function() {
-        this.runInterval = this.speedController.value;
+        this.runInterval = 4000; //this.speedController.value;
         this._switchContinueButtonToPause();
     },
 
