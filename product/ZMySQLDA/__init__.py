@@ -89,14 +89,17 @@ __version__='$Revision: 1.4 $'[11:-2]
 
 from . import DA
 
-methods=DA.folder_methods
 misc_=DA.misc_
 
 def initialize(context):
 
     context.registerClass(
         DA.Connection,
-        permission='Add Z MySQL Database Connections',
+        permission="Add Z MySQL Database Connections",
         constructors=(DA.manage_addZMySQLConnectionForm,
                       DA.manage_addZMySQLConnection),
     )
+    import Products
+    Products.meta_types += dict(Products.meta_types[-1],
+        name=DA.DeferredConnection.meta_type,
+        action=None),

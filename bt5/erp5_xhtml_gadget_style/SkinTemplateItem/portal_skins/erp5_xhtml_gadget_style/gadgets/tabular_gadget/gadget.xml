@@ -37,7 +37,8 @@
             <value> <unicode encoding="cdata"><![CDATA[
 
 <!-- Content  -->\n
-<div class="master" id="master"\n
+<div class="master"\n
+     id="master"\n
      tal:define="portal           here/portal_url/getPortalObject;\n
                  portal_path      portal_path | portal/absolute_url;\n
                  action_context   python: portal.restrictedTraverse(request.get(\'object_path\', \'?\'), here);\n
@@ -46,13 +47,11 @@
                  current_form_id python: request.get(\'current_form_id\', \'view\');\n
                  current_url      python: \'%s/%s\' % (url, current_form_id);\n
                  current_action   python: portal.ERP5Site_getCurrentAction(current_url, actions);\n
-                 actions actions/object_view | python: [];">\n
-\n
-\n
-  <div id="portal_status_message" style="height:20px; display:none;">\n
-    <p style="color:red; font-weight: bold;"></p>\n
-  </div>\n
-          \n
+                 actions actions/object_view | python: [];\n
+                 action_id_list python:[x[\'url\'].split(\'/\')[-1] for x in actions];\n
+                 data_gadget_property python: {\'tab_container_id\': \'form_gadget\',\n
+                                               \'default_tab_url\': action_id_list[0],\n
+                                               \'action_id_list\': action_id_list}">\n
   <div class="document">\n
 \n
     <div class="actions">\n
@@ -62,9 +61,9 @@
         <span class="description">Save</span>\n
       </button>\n
 \n
-      <script type="text/javascript"\n
-        tal:content="python: \'\'\'ERP5Form.setCurrentFormId(\'%s\');;\'\'\' %current_form_id">\n
-      </script>\n
+      <div data-gadget="erp5_tabbular_form_renderer"\n
+           id="erp5_tabbular_form_renderer"\n
+           tal:attributes="data-gadget-property python: here.Base_asJSON(data_gadget_property);"> </div>\n
 \n
       <!-- get all tabs from server -->\n
       <ul class="tabs">\n
@@ -73,32 +72,25 @@
               tal:define="action_form python: action[\'url\'].split(\'/\')[-1]"\n
               tal:attributes="id action_form;\n
                               class python: action == current_action and \'selected\' or \'not_selected\'">\n
-\n
-            <a tal:attributes="onclick python: \'\'\'javascript: RenderJs.TabbularGadget.addNewTabGadget(\'form_gadget\', \'%s/Form_asRenderJSGadget\', \'ERP5Form.update\', \'Form_asJSON?form_id=%s\');; RenderJs.TabbularGadget.toggleVisibility($(\'#%s\'));; ERP5Form.setCurrentFormId(\'%s\');;return false ;;\'\'\' %(action_form, action_form, action_form, action_form)">\n
+            <a tal:attributes="onclick python: \'\'\'javascript: return ERP5Form.onTabClickHandler(\'%s\')\'\'\' %action_form">\n
               <span i18n:translate=""\n
                     i18n:domain="ui"\n
                     tal:content="action/name">action_name</span>\n
             </a>\n
           </li>\n
         </tal:block>\n
-       </ul>\n
+      </ul>\n
 \n
     </div>\n
 \n
     <div class="content editable">\n
-    \n
-      <!--Form render goes here -->\n
-      <div id="form_gadget"\n
-           tal:attributes="data-gadget string:${current_form_id}/Form_asRenderJSGadget;\n
-                           data-gadget-source string:Form_asJSON?form_id=${current_form_id};\n
-                           data-gadget-handler string:ERP5Form.update;\n
-                           data-gadget-cacheable string:1;\n
-                           data-gadget-cache-id current_form_id;">\n
-      </div>\n
-       \n
+\n
+      <!--Form rendered content goes here -->\n
+      <div id="form_gadget"></div>\n
+\n
     </div>\n
   </div>\n
-        \n
+\n
 </div>
 
 ]]></unicode> </value>

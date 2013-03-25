@@ -149,6 +149,7 @@ class TestNode(object):
     for y in to_remove_reference_set:
       fpath = os.path.join(config['working_directory'],y)
       self.delNodeTestSuite(y)
+      self.log("testnode.checkOldTestSuite, DELETING : %r" % (fpath,))
       if os.path.isdir(fpath):
        shutil.rmtree(fpath)
       else:
@@ -212,16 +213,17 @@ branch = %(branch)s
     for vcs_repository in node_test_suite.vcs_repository_list:
       repository_path = vcs_repository['repository_path']
       repository_id = vcs_repository['repository_id']
+      branch = vcs_repository.get('branch')
       if not os.path.exists(repository_path):
         parameter_list = [config['git_binary'], 'clone',
                           vcs_repository['url']]
-        if vcs_repository.get('branch') is not None:
-          parameter_list.extend(['-b',vcs_repository.get('branch')])
+        if branch is not None:
+          parameter_list.extend(['-b', branch])
         parameter_list.append(repository_path)
         log(subprocess.check_output(parameter_list, stderr=subprocess.STDOUT))
       # Make sure we have local repository
       updater = Updater(repository_path, git_binary=config['git_binary'],
-         log=log, process_manager=self.process_manager)
+         branch=branch, log=log, process_manager=self.process_manager)
       updater.checkout()
       revision = "-".join(updater.getRevision())
       full_revision_list.append('%s=%s' % (repository_id, revision))
@@ -290,6 +292,8 @@ branch = %(branch)s
                                   'slapproxy.log')
     log('Configured slapproxy log to %r' % slapproxy_log)
     reset_software = slapos_instance.retry_software_count > 10
+    if reset_software:
+      slapos_instance.retry_software_count = 0
     log('testnode, retry_software_count : %r' % \
              slapos_instance.retry_software_count)
     self.slapos_controler = SlapOSControler.SlapOSControler(
