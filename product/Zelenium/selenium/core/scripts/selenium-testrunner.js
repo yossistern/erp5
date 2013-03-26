@@ -367,7 +367,7 @@ objectExtend(HtmlTestRunnerControlPanel.prototype, {
     },
 
     reset: function() {
-        this.runInterval = 4000; //this.speedController.value;
+        this.runInterval = 2000; //this.speedController.value;
         this._switchContinueButtonToPause();
     },
 
