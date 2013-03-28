@@ -4571,6 +4571,14 @@ class LocalRolesTemplateItem(BaseTemplateItem):
       xml_data += '\n <local_role_group_ids>'
       for local_role_group_id, local_roles_group_id_list in sorted(local_roles_group_id_dict.items()):
         xml_data += "\n  <local_role_group_id id='%s'>" % escape(local_role_group_id)
+        try:
+          for principal, role in sorted(local_roles_group_id_list):
+            pass
+        except ValueError:
+          # XXX temp commit
+          LOG('BusinessTemplate', 0, 'Unable to generate XML')
+          local_roles_group_id_list = []
+
         for principal, role in sorted(local_roles_group_id_list):
           xml_data += "\n    <principal id='%s'>%s</principal>" % \
                 (escape(principal), escape(role))
