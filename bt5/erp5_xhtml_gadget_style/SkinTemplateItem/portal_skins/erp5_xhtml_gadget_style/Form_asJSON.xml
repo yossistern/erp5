@@ -108,6 +108,11 @@ for field_id in form.get_field_ids():\n
       # server generates entire HTML\n
       field_dict[\'listbox\'][\'listbox_html\'] = original_field.render()\n
 \n
+  if field_meta_type == \'FloatField\':\n
+    # for FloatField send precision.\n
+    field_dict[\'precision\'] = original_field.get_value("precision")\n
+    field_dict[\'input_style\'] = original_field.get_value("input_style")\n
+\n
   if field_meta_type in LIST_FIELDS:\n
     # form contains selects, pass list of selects\' values and calculate default one?\n
     field_dict[\'items\'] = original_field.get_value("items")\n

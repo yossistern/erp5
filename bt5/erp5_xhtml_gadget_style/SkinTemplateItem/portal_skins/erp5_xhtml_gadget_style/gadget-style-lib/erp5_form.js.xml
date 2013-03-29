@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts63852017.7</string> </value>
+            <value> <string>ts64546119.58</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -204,6 +204,20 @@ var ERP5Form = ( function () {\n
 \n
           FloatField: function (field_id, field_dict) {\n
                       /* Float field */\n
+                      function formatFloat(input_style, value) {\n
+                        // do format a float\n
+                        // XXX: support other formats specified by ERP5\'s FloatField\n
+                        if (input_style==="-1 234.5") {\n
+                           value = value.replace(/(\\d)(?=(\\d{3})+\\.)/g, "$1 ");\n
+                        }\n
+                        return value;\n
+                      }\n
+                      var precision = field_dict.precision;\n
+                      if (field_dict.value!=="") {\n
+                        // use specified by server precision\n
+                        field_dict.value = field_dict.value.toFixed(precision);\n
+                        field_dict.value = formatFloat(field_dict.input_style, field_dict.value);\n
+                      }\n
                       return this.BaseInputField(field_id, field_dict);\n
           },\n
 \n
@@ -467,7 +481,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>21463</int> </value>
+            <value> <int>22256</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>
