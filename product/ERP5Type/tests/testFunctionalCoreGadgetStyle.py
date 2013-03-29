@@ -76,6 +76,11 @@ class TestZeleniumCore(ERP5TypeFunctionalTestCase):
                 # (erp5_accounting_alternate_catalog does not provide stat columns)
                 'erp5_movement_table_catalog',
 
+                # new gadget style
+                'erp5_jquery_plugin_json',
+                'erp5_jquery_plugin_renderjs', 
+                'erp5_jquery_plugin_jqgrid',
+                'erp5_xhtml_gadget_style'
                 )
 
 def test_suite():
