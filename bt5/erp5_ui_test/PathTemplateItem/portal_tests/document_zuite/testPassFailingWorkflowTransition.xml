@@ -74,6 +74,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_action\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>select_action</td>\n
   <td>Dummy Failing Workflow Action</td>\n
@@ -93,6 +98,11 @@ exception, the error is handled by the UI system and the error appears in\n
 portal status message.\n
 -->\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td/>\n
@@ -105,8 +115,7 @@ portal status message.\n
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

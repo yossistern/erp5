@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Simple CheckBoxField</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Simple CheckBoxField</td></tr>\n
@@ -84,6 +84,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_my_frozen\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertElementNotPresent</td>\n
   <td>//input[@name="field_my_frozen" and @checked]</td>\n
   <td></td>\n
@@ -93,6 +98,8 @@
   <td>field_my_frozen</td>\n
   <td></td>\n
 </tr>\n
+\n
+<tal:block tal:condition="not: is_gadget_style_installed">\n
 <tr>\n
   <td>clickAndWait</td>\n
   <td>Base_edit:method</td>\n
@@ -113,6 +120,61 @@
   <td>Base_edit:method</td>\n
   <td></td>\n
 </tr>\n
+</tal:block>\n
+\n
+<tal:block tal:condition="is_gadget_style_installed">\n
+<tr>\n
+  <td>click</td>\n
+  <td>//button[@class="save"]</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>openAndWait</td>\n
+  <td>${base_url}/foo_module/view</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>clickAndWait</td>\n
+  <td>link=0</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_my_frozen\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
+  <td>assertElementPresent</td>\n
+  <td>//input[@name="field_my_frozen" and @checked]</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>click</td>\n
+  <td>field_my_frozen</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>click</td>\n
+  <td>//button[@class="save"]</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>openAndWait</td>\n
+  <td>${base_url}/foo_module/view</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>clickAndWait</td>\n
+  <td>link=0</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_my_frozen\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+</tal:block>\n
+\n
 <tr>\n
   <td>verifyTitle</td>\n
   <td>*Foo - Title 0*</td> <!-- XXX not flexible -->\n
@@ -126,8 +188,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

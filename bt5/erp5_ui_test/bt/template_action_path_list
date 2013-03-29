@@ -16,6 +16,7 @@ Foo | view
 Foo | view_duration_field
 Foo | view_formbox
 Foo | view_formbox_dialog
+Foo | view_integer_fields
 Foo | view_listbox
 Foo | view_multiple_listbox
 Foo | view_planning

@@ -73,6 +73,11 @@ have id "2". This is probably a bit too stupid. -->\n
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>verifyPortalStatusMessage</td>\n
   <td>Object created.</td>\n
   <td></td>\n
@@ -92,6 +97,11 @@ have id "2". This is probably a bit too stupid. -->\n
   <td>assertTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyPortalStatusMessage</td>\n
@@ -122,6 +132,11 @@ have id "2". This is probably a bit too stupid. -->\n
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>verifyPortalStatusMessage</td>\n
   <td>Object created.</td>\n
   <td></td>\n
@@ -142,6 +157,11 @@ another object of the same type. -->\n
   <td>assertTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyPortalStatusMessage</td>\n
