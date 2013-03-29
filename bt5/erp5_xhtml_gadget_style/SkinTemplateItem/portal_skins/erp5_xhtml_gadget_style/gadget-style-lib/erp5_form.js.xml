@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts64546119.58</string> </value>
+            <value> <string>ts64565340.39</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -53,13 +53,19 @@ var ERP5Form = ( function () {\n
 \n
           updateField: function (dom, field_dict) {\n
                       /* General purpose field updater */\n
-                      var editable;\n
+                      var editable,\n
+                          dom_css_class = field_dict.css_class;\n
                       editable = Boolean(field_dict.editable);\n
-                      if (editable){\n
-                        dom.val(field_dict.value);}\n
+                      // set CSS class provided by server\n
+                      if (dom_css_class!==undefined) {\n
+                        dom.addClass(dom_css_class);\n
+                      }\n
+                      if (editable) {\n
+                        dom.val(field_dict.value);\n
+                      }\n
                       else{\n
-                        // if field is not editable just show its value\n
-                        dom.replaceWith(field_dict.value);\n
+                        // if field is not editable just show its value and set class as well as it\'s replaced!\n
+                        dom.replaceWith("<span class=" + dom_css_class + ">" + field_dict.value + "</span>");\n
                       }\n
           },\n
 \n
@@ -326,7 +332,6 @@ var ERP5Form = ( function () {\n
 \n
                                 // mark required fields visually\n
                                 if (field_dict.required){\n
-                                  //dom.parent().parent().parent().children("label").css("font-weight", "bold");}\n
                                   dom.parent().parent().parent().addClass("required-field");\n
                                 }\n
 \n
@@ -481,7 +486,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>22256</int> </value>
+            <value> <int>22511</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>
