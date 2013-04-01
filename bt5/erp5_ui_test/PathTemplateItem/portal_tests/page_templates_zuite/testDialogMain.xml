@@ -111,6 +111,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertTextPresent</td>\n
   <td>"Nothing" action is done.</td>\n
   <td></td>\n
@@ -151,8 +156,7 @@
   <td></td>\n
 </tr>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

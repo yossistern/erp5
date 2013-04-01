@@ -77,7 +77,7 @@
 </tal:block>\n
 \n
 <tr>\n
-  <td>open</td>\n
+  <td>openAndWait</td>\n
   <td tal:content="string: ${here/portal_url}/foo_module/view"/>\n
   <td></td>\n
 </tr>\n
@@ -87,6 +87,11 @@
   \'xh\': {\'find\': \'ukufumena\', \'sort\': \'sortx\'},\n
 }.items()">\n
 \n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_language\']")</td>\n
+  <td>30000</td>\n
+</tr>\n
 <tr>\n
   <td>selectAndWait</td>\n
   <td>select_language</td>\n
@@ -108,9 +113,14 @@
 </tal:block>\n
 \n
 <tr>\n
-  <td>open</td>\n
+  <td>openAndWait</td>\n
   <td tal:content="string: ${here/portal_url}/view">erp5/view</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+<td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_language\']")</td>\n
+  <td>30000</td>\n
 </tr>\n
 <tr>\n
   <td>selectAndWait</td>\n

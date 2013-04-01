@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Bread Crumbs</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Bread Crumb</td></tr>\n
@@ -74,6 +74,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'breadcrumb\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertText</td>\n
   <td>breadcrumb</td>\n
   <td>ERP5*/*Foos*/*Title 0*/</td>\n
@@ -83,11 +88,31 @@
   <td>field_my_short_title</td>\n
   <td>short</td>\n
 </tr>\n
+<tal:block tal:condition="not: is_gadget_style_installed">\n
 <tr>\n
   <td>clickAndWait</td>\n
   <td>//button[@title=\'Save\']</td>\n
   <td></td>\n
 </tr>\n
+</tal:block>\n
+\n
+<tal:block tal:condition="is_gadget_style_installed">\n
+<tr>\n
+  <td>click</td>\n
+  <td>//button[@title=\'Save\']</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>open</td>\n
+  <td>${base_url}/foo_module/0</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'breadcrumb\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+</tal:block>\n
 <tr>\n
   <td>assertText</td>\n
   <td>breadcrumb</td>\n
@@ -99,8 +124,18 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'breadcrumb\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>assertAbsoluteLocation</td>\n
   <td tal:content="string:glob:${here/portal_url}/foo_module/0/view" />\n
+  <td></td>\n
+</tr>\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>assertAbsoluteLocation</td>\n
+  <td tal:content="string:glob:${here/portal_url}/foo_module/0/view#/Foo_view/" />\n
   <td></td>\n
 </tr>\n
 <tr>\n

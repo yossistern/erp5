@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Dialog Buttons</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test dialog button for actions and update redirect to the good action</td></tr>\n
@@ -54,9 +54,14 @@
   <td></td>\n
 </tr>\n
 <tr>\n
-  <td>open</td>\n
+  <td>openAndWait</td>\n
   <td>${base_url}/foo_module/1/view</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//button[@title=\'Import / Export\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>clickAndWait</td>\n
@@ -84,6 +89,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertPortalStatusMessage</td>\n
   <td>"Update" action is done with "A value from the user".</td>\n
   <td></td>\n
@@ -94,11 +104,20 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertPortalStatusMessage</td>\n
   <td>"Nothing" action is done.</td>\n
   <td></td>\n
 </tr>\n
-\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//button[@title=\'Import / Export\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
 <tr>\n
   <td>clickAndWait</td>\n
    <td>//button[@title="Import / Export"]</td>\n
@@ -110,13 +129,24 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>assertPortalStatusMessage</td>\n
   <td></td>\n
   <td></td>\n
 </tr>\n
-<tr>\n
+<tr tal:condition="not:is_gadget_style_installed">\n
   <td>assertAbsoluteLocation</td>\n
   <td tal:content="string:glob:${here/portal_url}/foo_module/1/Foo_view" />\n
+  <td></td>\n
+</tr>\n
+\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>assertAbsoluteLocation</td>\n
+  <td tal:content="string:glob:${here/portal_url}/foo_module/1/Foo_view#/Foo_view/" />\n
   <td></td>\n
 </tr>\n
 <tr>\n
@@ -125,8 +155,7 @@
   <td></td>\n
 </tr>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

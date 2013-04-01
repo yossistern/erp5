@@ -105,6 +105,11 @@ This is currently an expected failure.\n
   <td>Change State</td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@class=\'listbox_set_page workflow_action_listbox_set_page\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>type</td>\n
   <td>//input[@class="listbox_set_page workflow_action_listbox_set_page"]</td>\n
   <td>1</td>\n

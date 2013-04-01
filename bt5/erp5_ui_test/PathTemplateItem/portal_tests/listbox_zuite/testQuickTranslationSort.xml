@@ -269,9 +269,14 @@
   <td></td>\n
 </tr>\n
 <tr>\n
-  <td>open</td>\n
+  <td>openAndWait</td>\n
   <td>${base_url}/foo_module/view</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+<td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_language\']")</td>\n
+  <td>30000</td>\n
 </tr>\n
 <tr>\n
   <td>selectAndWait</td>\n
@@ -372,7 +377,12 @@
 </tr>\n
 <!-- Restore english language -->\n
 <tr>\n
-  <td>selectAndWait</td>\n
+<td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_language\']")</td>\n
+  <td>30000</td>\n
+</tr>\n
+<tr>\n
+  <td>select</td>\n
   <td>select_language</td>\n
   <td>label=English</td>\n
 </tr> \n
@@ -380,8 +390,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

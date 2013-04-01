@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Drop Down List Action when Nothing is Selected</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Drop Down List Action when Nothing is\n
@@ -62,6 +62,12 @@ shouldn\'t do anything. -->\n
                                             \'Jump\',\n
                                             \'Action\']">\n
   <tr>\n
+    <td>waitForCondition</td>\n
+    <td tal:content="string:selenium.isElementPresent(\'//button[@title=\\\'${button_title}\\\']\')"></td>\n
+    <td>30000</td> \n
+  </tr>\n
+\n
+  <tr>\n
     <td>click</td>\n
     <td tal:content="string://button[@title=\'${button_title}\']"/>\n
     <td></td>\n
@@ -73,9 +79,14 @@ shouldn\'t do anything. -->\n
     <td>1000</td>\n
     <td></td>\n
   </tr>\n
-  <tr>\n
+  <tr tal:condition="not: is_gadget_style_installed">\n
     <td>assertAbsoluteLocation</td>\n
     <td>${base_url}/foo_module/1</td>\n
+    <td/>\n
+  </tr>\n
+  <tr tal:condition="is_gadget_style_installed">\n
+    <td>assertAbsoluteLocation</td>\n
+    <td>${base_url}/foo_module/1#/Foo_view/</td>\n
     <td/>\n
   </tr>\n
   <tr>\n

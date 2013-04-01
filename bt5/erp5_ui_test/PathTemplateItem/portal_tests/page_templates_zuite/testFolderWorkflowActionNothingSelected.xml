@@ -86,6 +86,11 @@
 \n
 <!-- first case, the user select nothing -->\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_action\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>select_action</td>\n
   <td>Change State</td>\n
@@ -94,6 +99,11 @@
   <td>clickAndWait</td>\n
   <td>Base_callDialogMethod:method</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>assertPortalStatusMessage</td>\n
@@ -106,6 +116,11 @@
   <td>open</td>\n
   <td tal:content="string: ${here/portal_url}/foo_module/view">/erp5/foo_module/view</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_action\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>selectAndWait</td>\n
@@ -128,6 +143,11 @@
   <td>clickAndWait</td>\n
   <td>Base_callDialogMethod:method</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'select_action\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>assertPortalStatusMessage</td>\n

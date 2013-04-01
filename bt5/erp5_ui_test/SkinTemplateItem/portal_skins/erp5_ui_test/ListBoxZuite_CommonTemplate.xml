@@ -83,7 +83,13 @@
       <td></td>\n
     </tr>\n
   </tal:block>\n
-  <tal:block metal:define-macro="checkCurrentPage">\n
+  <tal:block metal:define-macro="checkCurrentPage"\n
+        tal:define="selector python: test(prefix==\'listbox\', \'//input[@class=&quot;%s_set_page&quot;]\' %prefix, \'//input[@class=&quot;listbox_set_page %s_set_page&quot;]\' %prefix)">\n
+    <tr>\n
+      <td>waitForCondition</td>\n
+      <td tal:content="string: selenium.isElementPresent(\'${selector}\')"></td>\n
+      <td>30000</td>\n
+    </tr>\n
     <tr>\n
       <td>assertValue</td>\n
       <!--<tal:block tal:condition="python: context.TestTool_getSkinName()!=\'Mobile\'">\n

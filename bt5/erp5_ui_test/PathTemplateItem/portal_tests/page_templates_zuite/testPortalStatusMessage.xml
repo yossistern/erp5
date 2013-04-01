@@ -42,16 +42,26 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Portal Status Message</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Portal Status Message</td></tr>\n
 </thead><tbody>\n
 <tal:block metal:use-macro="here/PTZuite_CommonTemplate/macros/init" />\n
-<tr>\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>open</td>\n
   <td tal:content="string: ${here/portal_url}/foo_module/1/view?portal_status_message=Dummy+Portal+Status+Message">/erp5/foo_module/1/view</td>\n
   <td></td>\n
+</tr>\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>open</td>\n
+  <td tal:content="string: ${here/portal_url}/foo_module/1/view?portal_status_message=Dummy Portal Status Message">/erp5/foo_module/1/view</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>assertTextPresent</td>\n
@@ -65,10 +75,22 @@
   <td></td>\n
 </tr>\n
 <!-- when we follow a link, psm must be empty. -->\n
-<tr>\n
+\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>clickAndWait</td>\n
   <td>link=View</td>\n
   <td></td>\n
+</tr>\n
+\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>click</td>\n
+  <td>link=Title 1</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>assertPortalStatusMessage</td>\n
@@ -76,8 +98,7 @@
   <td></td>\n
 </tr>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>
