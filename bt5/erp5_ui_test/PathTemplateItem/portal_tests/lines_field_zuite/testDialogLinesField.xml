@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Dialog Main</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test that the content of LinesField textarea doesn\'t change when sort button in sub document list is clicked</td></tr>\n
@@ -54,72 +54,76 @@
   <td></td>\n
 </tr>\n
 <tr>\n
-  <td>type</td>\n
-  <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo<br/>bar</td>\n
-</tr>\n
-<tal:block tal:condition="python: context.TestTool_getSkinName()!=\'Mobile\'">\n
-<tr>\n
-  <td>clickAndWait</td>\n
-  <td>//button[@value=\'listbox.title\']</td>\n
-  <td></td>\n
-</tr>\n
-</tal:block>\n
-<tr>\n
-  <td>assertValue</td>\n
-  <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo<br/>bar</td>\n
-</tr>\n
-<tr>\n
-  <td>clickAndWait</td>\n
-  <td>//button[@title=\'Save\']</td>\n
-  <td></td>\n
-</tr>\n
-<tr>\n
-  <td>verifyPortalStatusMessage</td>\n
-  <td>Data updated.</td>\n
-  <td></td>\n
-</tr>\n
-<tr>\n
-  <td>assertValue</td>\n
-  <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo<br/>bar</td>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//textarea[@name=\'field_my_lines_list\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>type</td>\n
   <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo bar</td>\n
+  <td>foo<br/>bar</td>\n
 </tr>\n
-<tal:block tal:condition="python: context.TestTool_getSkinName()!=\'Mobile\'">\n
-<tr>\n
-  <td>clickAndWait</td>\n
-  <td>//button[@value=\'listbox.title\']</td>\n
-  <td></td>\n
-</tr>\n
+\n
+<tal:block tal:condition="not: is_gadget_style_installed">\n
+  <tal:block tal:condition="python: context.TestTool_getSkinName()!=\'Mobile\'">\n
+  <tr>\n
+    <td>clickAndWait</td>\n
+    <td>//button[@value=\'listbox.title\']</td>\n
+    <td></td>\n
+  </tr>\n
+  </tal:block>\n
+  <tr>\n
+    <td>assertValue</td>\n
+    <td>//textarea[@name=\'field_my_lines_list\']</td>\n
+    <td>foo<br/>bar</td>\n
+  </tr>\n
+  <tr>\n
+    <td>type</td>\n
+    <td>//textarea[@name=\'field_my_lines_list\']</td>\n
+    <td>foo bar</td>\n
+  </tr>\n
+  <tr>\n
+    <td>clickAndWait</td>\n
+    <td>//button[@title=\'Save\']</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>verifyPortalStatusMessage</td>\n
+    <td>Data updated.</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>assertValue</td>\n
+    <td>//textarea[@name=\'field_my_lines_list\']</td>\n
+    <td>foo bar</td>\n
+  </tr>\n
 </tal:block>\n
-<tr>\n
-  <td>assertValue</td>\n
-  <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo bar</td>\n
-</tr>\n
-<tr>\n
-  <td>clickAndWait</td>\n
-  <td>//button[@title=\'Save\']</td>\n
-  <td></td>\n
-</tr>\n
-<tr>\n
-  <td>verifyPortalStatusMessage</td>\n
-  <td>Data updated.</td>\n
-  <td></td>\n
-</tr>\n
-<tr>\n
-  <td>assertValue</td>\n
-  <td>//textarea[@name=\'field_my_lines_list\']</td>\n
-  <td>foo bar</td>\n
-</tr>\n
+\n
+<tal:block tal:condition="is_gadget_style_installed">\n
+  <tr>\n
+    <td>click</td>\n
+    <td>//button[@class=\'save\']</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>open</td>\n
+    <td>${base_url}/foo_module/1/view</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>waitForCondition</td>\n
+    <td>selenium.isElementPresent("//textarea[@name=\'field_my_lines_list\']")</td>\n
+    <td>30000</td> \n
+  </tr>\n
+  <tr>\n
+    <td>assertValue</td>\n
+    <td>//textarea[@name=\'field_my_lines_list\']</td>\n
+    <td>foo<br/>bar</td>\n
+  </tr>\n
+</tal:block>\n
+\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>
