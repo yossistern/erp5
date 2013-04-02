@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts64565340.39</string> </value>
+            <value> <string>ts64910682.26</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -169,6 +169,12 @@ var ERP5Form = ( function () {\n
 \n
           TextAreaField: function (field_id, field_dict) {\n
                       /* TextArea field */\n
+                      return this.BaseInputField(field_id, field_dict);\n
+          },\n
+\n
+          LinesField: function (field_id, field_dict) {\n
+                      /* LinesField field */\n
+                      field_dict.value = field_dict.value.join("\\n");\n
                       return this.BaseInputField(field_id, field_dict);\n
           },\n
 \n
@@ -486,7 +492,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>22511</int> </value>
+            <value> <int>22768</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>
