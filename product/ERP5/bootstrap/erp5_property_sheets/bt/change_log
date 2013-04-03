@@ -1,7 +1,3 @@
-2013-04-03 tatuya
-* Add a property to handle Inventory re-indexing when
-adding inventory correction movements.
-
 2012-03-07 arnaud.fontaine
 * Add property to define preferred source code editor to Preference Property Sheets.
 

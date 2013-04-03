@@ -77,8 +77,7 @@ class TestInventory(TestOrderMixin, ERP5TypeTestCase):
     """
     return ('erp5_base', 'erp5_pdm', 'erp5_simulation', 'erp5_trade',
             'erp5_configurator_standard_trade_template',
-            'erp5_apparel', 'erp5_simulation_test',
-            'erp5_movement_table_catalog')
+            'erp5_apparel', 'erp5_simulation_test')
 
   def setUpPreferences(self):
     #create apparel variation preferences
@@ -2862,12 +2861,8 @@ class TestInventory(TestOrderMixin, ERP5TypeTestCase):
     sequence_list.addSequenceString(sequence_string)
     sequence_list.play(self)
 
-  def stepSetPreferredReindexInventoryWhenAddingPreviousMovement(
-        self, sequence=None, sequence_list=None, **kw):
-    portal_preferences = self.getPreferenceTool()
-    preference = getattr(portal_preferences, 'test_site_preference', None)
-    preference.setPreferredReindexInventoryWhenAddingPreviousMovement(True)
-
+  # Note: This inventory reindex function is not implemented yet
+  @expectedFailure
   def test_11_FullInventoryAddOldMovement(self, quiet=0, run=run_all_test):
     """
     Make sure the following case:
@@ -2893,7 +2888,6 @@ class TestInventory(TestOrderMixin, ERP5TypeTestCase):
     sequence_list = SequenceList()
     sequence_string = 'CreateOrganisationsForModule \
                        CreateNotVariatedResource \
-                       SetPreferredReindexInventoryWhenAddingPreviousMovement \
                        Tic \
                        CreatePackingListAtTheDate1 \
                        CreatePackingListLine \
