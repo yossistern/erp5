@@ -471,6 +471,7 @@ class SyncMLSubscription(XMLObject):
     """
     Add delete command to syncml resposne
     """
+    # XXX property must be renamed to activity_enabled
     if self.getIsActivityEnabled():
       self.recurseCallMethod(
         method_id="getId",
@@ -487,7 +488,7 @@ class SyncMLSubscription(XMLObject):
       # XXX not efficient at all but must not be used (former way)
       syncml_logger.warning("Using non-efficient way to retrieve delete object on %s"
                             % (self.getRelativeUrl(),))
-      id_list = [x.getId() for x in self.contentValues() if \
+      id_list = [x.getId() for x in self.objectValues() if \
                    x.getValidationState() == "not_synchronized"]
       for gid in id_list:
         syncml_response.addDeleteCommand(gid=gid)
