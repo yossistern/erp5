@@ -2867,6 +2867,8 @@ class TestInventory(TestOrderMixin, ERP5TypeTestCase):
     portal_preferences = self.getPreferenceTool()
     preference = getattr(portal_preferences, 'test_site_preference', None)
     preference.setPreferredReindexInventoryWhenAddingPreviousMovement(True)
+    # preferance can be cached due to other tests result, so refresh it
+    self.portal.portal_caches.clearAllCache()
 
   def test_11_FullInventoryAddOldMovement(self, quiet=0, run=run_all_test):
     """
