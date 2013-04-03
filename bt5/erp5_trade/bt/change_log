@@ -1,3 +1,6 @@
+2013-04-03 Tatuya
+* Add a field into Trade Preference to handle inventory re-indexing when adding inventory correction movements.
+
 2012-01-05 Kazuhiko
 * move builders from erp5_trade to erp5_simulation_test BT.
 

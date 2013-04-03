@@ -80,7 +80,9 @@
                 <item>
                     <key> <string>center</string> </key>
                     <value>
-                      <list/>
+                      <list>
+                        <string>my_preferred_reindex_inventory_when_adding_previous_movement</string>
+                      </list>
                     </value>
                 </item>
                 <item>
