@@ -12,6 +12,7 @@
 #
 ##############################################################################
 from Products.ZSQLCatalog.zsqlbrain import ZSQLBrain
+from Products.ERP5Type.TransactionalVariable import getTransactionalVariable
 from DateTime import DateTime
 from ZTUtils import make_query
 from Products.CMFCore.utils import getToolByName
@@ -113,6 +114,59 @@ class InventoryListBrain(ZSQLBrain):
     resource = self.portal_catalog.getObject(self.resource_uid)
     if resource is not None:
       return resource.getQuantityUnit()
+
+  def _getObjectByUid(self, uid):
+    uid_cache = getTransactionalVariable().setdefault('InventoryBrain.uid_cache', {})
+    try:
+      return uid_cache[uid]
+    except KeyError:
+      uid_cache[uid] = result = self.portal_catalog.getObject(uid)
+      return result
+
+  def getSectionValue(self):
+    return self._getObjectByUid(self.section_uid)
+
+  def getSectionTitle(self):
+    section = self.getSectionValue()
+    if section is not None:
+      return section.getTitle()
+  section_title = ComputedAttribute(getSectionTitle, 1)
+
+  def getSectionRelativeUrl(self):
+    section = self.getSectionValue()
+    if section is not None:
+      return section.getRelativeUrl()
+  section_relative_url = ComputedAttribute(getSectionRelativeUrl, 1)
+
+  def getNodeValue(self):
+    return self._getObjectByUid(self.node_uid)
+
+  def getNodeTitle(self):
+    node = self.getNodeValue()
+    if node is not None:
+      return node.getTitle()
+  node_title = ComputedAttribute(getNodeTitle, 1)
+
+  def getNodeRelativeUrl(self):
+    node = self.getNodeValue()
+    if node is not None:
+      return node.getRelativeUrl()
+  node_relative_url = ComputedAttribute(getNodeRelativeUrl, 1)
+
+  def getResourceValue(self):
+    return self._getObjectByUid(self.resource_uid)
+
+  def getResourceTitle(self):
+    resource = self.getResourceValue()
+    if resource is not None:
+      return resource.getTitle()
+  resource_title = ComputedAttribute(getResourceTitle, 1)
+
+  def getResourceRelativeUrl(self):
+    resource = self.getResourceValue()
+    if resource is not None:
+      return resource.getRelativeUrl()
+  resource_relative_url = ComputedAttribute(getResourceRelativeUrl, 1)
 
   def getListItemUrl(self, cname_id, selection_index, selection_name):
     """Returns the URL for column `cname_id`. Used by ListBox
@@ -331,7 +385,7 @@ class MovementHistoryListBrain(InventoryListBrain):
     obj = self.getObject()
     if obj is not None:
       timezone = None
-      if self.node_relative_url == obj.getSource():
+      if self.node_uid == obj.getSourceUid():
         start_date = obj.getStartDate()
         if start_date is not None:
           timezone = start_date.timezone()
