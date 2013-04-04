@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Form Box Edition</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Form Box Edition</td></tr>\n
@@ -69,10 +69,21 @@
   <td></td>\n
 </tr>\n
 \n
-<tr>\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>open</td>\n
   <td>${base_url}/foo_module/0/Foo_viewFormBox</td>\n
   <td></td>\n
+</tr>\n
+\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>open</td>\n
+  <td>${base_url}/foo_module/0/view#/Foo_viewFormBox/</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_my_formbox_my_title\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 \n
 <!-- Initialize -->\n
@@ -91,15 +102,42 @@
   <td>field_my_formbox_my_description</td>\n
   <td>Default description</td>\n
 </tr>\n
+\n
+<tal:block tal:condition="not: is_gadget_style_installed">\n
+  <tr>\n
+    <td>clickAndWait</td>\n
+    <td>//button[@title=\'Save\']</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>verifyPortalStatusMessage</td>\n
+    <td>Data updated.</td>\n
+    <td></td>\n
+  </tr>\n
+</tal:block>\n
+\n
+<tal:block tal:condition="is_gadget_style_installed"> \n
+  <tr>\n
+    <td>click</td>\n
+    <td>//button[@class=\'save\']</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>openAndWait</td>\n
+    <td>${base_url}/foo_module/view</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>open</td>\n
+    <td>${base_url}/foo_module/0/view#/Foo_viewFormBox/</td>\n
+    <td></td>\n
+  </tr>\n
+</tal:block>\n
+\n
 <tr>\n
-  <td>clickAndWait</td>\n
-  <td>//button[@title=\'Save\']</td>\n
-  <td></td>\n
-</tr>\n
-<tr>\n
-  <td>verifyPortalStatusMessage</td>\n
-  <td>Data updated.</td>\n
-  <td></td>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_my_formbox_my_title\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyValue</td>\n
@@ -119,8 +157,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>
