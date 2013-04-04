@@ -116,7 +116,8 @@ class InventoryListBrain(ZSQLBrain):
       return resource.getQuantityUnit()
 
   def _getObjectByUid(self, uid):
-    uid_cache = getTransactionalVariable().setdefault('InventoryBrain.uid_cache', {})
+    uid_cache = getTransactionalVariable().setdefault(
+                    'InventoryBrain.uid_cache', {None: None})
     try:
       return uid_cache[uid]
     except KeyError:

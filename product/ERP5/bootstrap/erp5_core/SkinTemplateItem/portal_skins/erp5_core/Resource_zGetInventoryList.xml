@@ -167,7 +167,6 @@ WHERE\n
 \n
 <dtml-if transformed_uid>\n
   AND transformation.uid = <dtml-var stock_table_id>.resource_uid\n
-  AND resource.uid = transformation.uid\n
   AND <dtml-var stock_table_id>.variation_text = transformation.variation_text\n
 \n
   AND transformed_resource.uid = transformation.transformed_uid\n
