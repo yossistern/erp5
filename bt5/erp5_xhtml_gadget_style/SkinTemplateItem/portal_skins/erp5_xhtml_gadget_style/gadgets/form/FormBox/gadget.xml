@@ -42,8 +42,7 @@
 
 <tal:block tal:define="field_name request/field_name | options/field_name">\n
 \n
-  <input type="text"\n
-    tal:attributes="name field_name"/>\n
+  <span tal:attributes="id field_name" class="FormBox"/>\n
 \n
 </tal:block>
 

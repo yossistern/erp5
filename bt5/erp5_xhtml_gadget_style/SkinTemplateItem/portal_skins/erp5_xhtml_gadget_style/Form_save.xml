@@ -77,11 +77,23 @@ except FormValidationError, validation_errors:\n
   field_errors = form.ErrorFields(validation_errors)\n
   for key, value in field_errors.items():\n
     result[\'field_errors\'][key] = value.error_text\n
+\n
+  form_field_id_list = form.get_field_ids()\n
+  form_field_list = [getattr(form, x)  for x in form_field_id_list]\n
+  form_box_field_list = [x for x in form_field_list if x.meta_type==\'FormBox\']\n
+  if len(form_box_field_list):\n
+    # formbox errors come wihout leading formbox field prefix so we need to \n
+    # fix it here so client knows where to show error message.\n
+    for field_id, error in result[\'field_errors\'].items():\n
+      if field_id not in form_field_id_list:\n
+        # field is part of form box\n
+        result[\'field_errors\'][\'%s_%s\' %(form_box_field_list[0].getId(), field_id)] = error\n
+  #context.log("errors: %s" %result)\n
   return dumps(result)\n
 \n
 (kw, encapsulated_editor_list), action = context.Base_edit(form_id, silent_mode=1)\n
 \n
-context.log(kw)\n
+#context.log(kw)\n
 context.edit(REQUEST=request, edit_order=edit_order, **kw)\n
 for encapsulated_editor in encapsulated_editor_list:\n
   encapsulated_editor.edit(context)\n

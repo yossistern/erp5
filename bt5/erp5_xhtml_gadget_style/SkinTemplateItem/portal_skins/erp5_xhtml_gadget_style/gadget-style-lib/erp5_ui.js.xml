@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts63878317.05</string> </value>
+            <value> <string>ts65064401.52</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -73,7 +73,6 @@ var ERP5UI = ( function () {\n
               success: function (data) {\n
                         var jump_dom = $(\'select[name="select_jump"]\'),\n
                             action_dom = $(\'select[name="select_action"]\');\n
-                            console.log(data);\n
                         addOptionTagDict(jump_dom, data.object_jump_list);\n
                         addOptionTagDict(jump_dom, data.type_info_list);\n
                         addOptionTagDict(jump_dom, data.workflow_list);\n
@@ -101,7 +100,7 @@ var ERP5UI = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>2993</int> </value>
+            <value> <int>2946</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>

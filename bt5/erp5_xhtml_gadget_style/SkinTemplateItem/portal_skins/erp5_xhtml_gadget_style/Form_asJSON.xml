@@ -119,12 +119,10 @@ for field_id in form.get_field_ids():\n
 \n
   if field_meta_type in ["FormBox"]:\n
     # this is a special case as this field is part of another form\'s fields\n
+    # for now we transmit entire html created server side\n
     formbox_target_id = original_field.get_value("formbox_target_id")\n
     formbox_form = getattr(context, formbox_target_id)\n
-    # get all values\n
-    for formbox_field_id in formbox_form.get_field_ids():\n
-      formbox_field_id_field = getattr(formbox_form, formbox_field_id)\n
-      field_value = formbox_field_id_field.get_value("default") # only last wins ?\n
+    field_value = formbox_form(key_prefix=\'field_%s\' %field_id)\n
 \n
   # add field value\n
   field_dict[\'value\'] =  field_value\n

@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts64910682.26</string> </value>
+            <value> <string>ts65078817.87</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -235,8 +235,14 @@ var ERP5Form = ( function () {\n
 \n
           FormBox: function (field_id, field_dict) {\n
                       /* FormBox field */\n
-                      // XXX: implement it to read all values and render properly\n
-                      return this.BaseInputField(field_id, field_dict);\n
+                      var form_box_dom = $("#field_"+field_id);\n
+                      form_box_dom.html(field_dict.value);\n
+                      // hide title of field\n
+                      //$(\'label:contains("\' + field_dict.title + \'")\').remove()\n
+                      // make all inputs serialize-able\n
+                      // XXX: get list of editable fields from form box server side as now it\'s hard coded\n
+                      form_box_dom.find("input, textarea, select").addClass(ERP5Form.SERIALIZE_ABLE_CLASS_NAME);\n
+                      return form_box_dom;\n
           },\n
 \n
           RelationStringField: function (field_id, field_dict) {\n
@@ -470,11 +476,21 @@ var ERP5Form = ( function () {\n
               setTimeout(function() {\n
                 var left_height = $(\'fieldset.left\').height(),\n
                     right_height = $(\'fieldset.right\').height();\n
+                  function filterFormBox() {\n
+                    // Eliminate all fieldset inserted by FormBox fields\n
+                    var class_name = $(this).parent().attr("class");\n
+                    return (class_name===undefined) || (class_name!==undefined && class_name.indexOf("FormBox")===-1);\n
+                  }\n
+\n
                   if (right_height <= left_height) {\n
-                    $(\'fieldset.right\').height(left_height);\n
+                    $(\'fieldset.right\')\n
+                    .filter(filterFormBox)\n
+                    .height(left_height);\n
                   }\n
                   else {\n
-                    $(\'fieldset.left\').height(right_height);\n
+                    $(\'fieldset.left\')\n
+                    .filter(filterFormBox)\n
+                    .height(right_height);\n
                   }\n
                 }, 500);\n
             });\n
@@ -492,7 +508,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>22768</int> </value>
+            <value> <int>23637</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>
