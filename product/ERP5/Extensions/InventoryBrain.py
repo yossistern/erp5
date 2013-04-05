@@ -13,7 +13,6 @@
 ##############################################################################
 from Products.ZSQLCatalog.zsqlbrain import ZSQLBrain
 from Products.ERP5Type.TransactionalVariable import getTransactionalVariable
-from DateTime import DateTime
 from ZTUtils import make_query
 from Products.CMFCore.utils import getToolByName
 from zLOG import LOG, PROBLEM
@@ -56,7 +55,6 @@ class InventoryBrain(ZSQLBrain):
                        list(self.getPortalCurrentInventoryStateList()))
 
   def getAvailableInventory(self):
-    at_date=DateTime()
     current = self.getCurrentInventory()
     result = self.Resource_zGetInventory( 
                     resource_uid=[self.resource_uid], ignore_variation=1,
@@ -370,7 +368,6 @@ class DeliveryListBrain(InventoryListBrain):
     """
       Returns current inventory at current date
     """
-    at_date = DateTime()
     current = self.getCurrentInventory()
     result = self.Resource_zGetInventory(
                 resource_uid = [self.resource_uid],
