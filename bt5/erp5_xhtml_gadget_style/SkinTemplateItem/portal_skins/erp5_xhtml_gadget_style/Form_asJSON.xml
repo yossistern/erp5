@@ -71,7 +71,12 @@ for field_id in form.get_field_ids():\n
   if field.meta_type == "ProxyField":\n
     field = field.getRecursiveTemplateField()\n
   field_meta_type = field.meta_type\n
-  field_value = original_field.get_value("default")\n
+  \n
+  field_value = \'\'\n
+  # some special cases\n
+  if not field_meta_type in ["MatrixBox", "FormBox"]:\n
+    field_value = original_field.get_value("default")\n
+\n
   field_dict = result[\'form_data\'][field_id] = {}\n
 \n
   field_dict[\'type\'] = field_meta_type\n
@@ -123,6 +128,10 @@ for field_id in form.get_field_ids():\n
     formbox_target_id = original_field.get_value("formbox_target_id")\n
     formbox_form = getattr(context, formbox_target_id)\n
     field_value = formbox_form(key_prefix=\'field_%s\' %field_id)\n
+\n
+  if field_meta_type in ["MatrixBox"]:\n
+    context.REQUEST.set(\'here\', context)\n
+    field_value = field.render_htmlgrid(None, context.REQUEST, render_prefix=\'\', key_prefix=\'\')[0][1]\n
 \n
   # add field value\n
   field_dict[\'value\'] =  field_value\n

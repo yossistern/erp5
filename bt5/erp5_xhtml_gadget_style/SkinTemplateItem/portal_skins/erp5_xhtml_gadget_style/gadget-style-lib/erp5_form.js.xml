@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts65078817.87</string> </value>
+            <value> <string>ts65161220.11</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -243,6 +243,12 @@ var ERP5Form = ( function () {\n
                       // XXX: get list of editable fields from form box server side as now it\'s hard coded\n
                       form_box_dom.find("input, textarea, select").addClass(ERP5Form.SERIALIZE_ABLE_CLASS_NAME);\n
                       return form_box_dom;\n
+          },\n
+\n
+          MatrixBox: function (field_id, field_dict) {\n
+                      /* FormBox field */\n
+                      var matrix_box_dom = $("#field_"+field_id);\n
+                      matrix_box_dom.html(field_dict.value);\n
           },\n
 \n
           RelationStringField: function (field_id, field_dict) {\n
@@ -508,7 +514,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>23637</int> </value>
+            <value> <int>23875</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>
