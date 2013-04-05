@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test Delete</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test Delete</td></tr>\n
@@ -269,7 +269,7 @@ It contains the same columns\n
   <td></td>\n
 </tr>\n
 <tal:block tal:condition="python: context.TestTool_getSkinName()!=\'Mobile\'">\n
-<tr>\n
+<tr tal:condition="is_gadget_style_installed">\n
 <td>waitForCondition</td>\n
   <td>selenium.isElementPresent("//div[@id=\'field_listbox_field\']")</td>\n
   <td>30000</td>\n
