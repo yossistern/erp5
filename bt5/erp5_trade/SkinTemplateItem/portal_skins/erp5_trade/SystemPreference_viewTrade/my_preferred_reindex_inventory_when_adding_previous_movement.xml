@@ -90,7 +90,7 @@
                 </item>
                 <item>
                     <key> <string>title</string> </key>
-                    <value> <string>Reindex the equivalent inventory when you are adding (correction) movements AFTER inventory stock taking</string> </value>
+                    <value> <string>Reindex Equivalent Inventory when Adding Movements after Inventory Stock Taking</string> </value>
                 </item>
               </dictionary>
             </value>
