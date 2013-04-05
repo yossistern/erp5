@@ -42,7 +42,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n
 <title>Test MatrixBox Cell Creation</title>\n
 </head>\n
-<body>\n
+<body tal:define="is_gadget_style_installed here/ERP5Site_isXHTMLGadgetStyleInstalled">\n
 <table cellpadding="1" cellspacing="1" border="1">\n
 <thead>\n
 <tr><td rowspan="1" colspan="3">Test MatrixBox Cell Creation</td></tr>\n
@@ -69,10 +69,20 @@
   <td>Done.</td>\n
   <td></td>\n
 </tr>\n
-<tr>\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>open</td>\n
   <td>${base_url}/foo_module/0/1/FooLine_viewMatrixBox</td>\n
   <td></td>\n
+</tr>\n
+<tr tal:condition="is_gadget_style_installed">\n
+  <td>open</td>\n
+  <td>${base_url}/foo_module/0/1/view#/FooLine_viewMatrixBox/</td>\n
+  <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//input[@name=\'field_matrixbox_quantity_cell_0_0_0\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 \n
 <tr>\n
@@ -80,11 +90,35 @@
   <td>field_matrixbox_quantity_cell_0_0_0</td>\n
   <td>1.0</td>\n
 </tr>\n
-<tr>\n
+<tr tal:condition="not: is_gadget_style_installed">\n
   <td>clickAndWait</td>\n
   <td>Base_edit:method</td>\n
   <td></td>\n
 </tr>\n
+<tal:block tal:condition="is_gadget_style_installed">\n
+  <tr>\n
+    <td>click</td>\n
+    <td>//button[@class=\'save\']</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>open</td>\n
+    <td>${base_url}/foo_module/0/1/view</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>open</td>\n
+    <td>${base_url}/foo_module/0/1/view#/FooLine_viewMatrixBox/</td>\n
+    <td></td>\n
+  </tr>\n
+  <tr>\n
+    <td>waitForCondition</td>\n
+    <td>selenium.isElementPresent("//input[@name=\'field_matrixbox_quantity_cell_0_0_0\']")</td>\n
+    <td>30000</td> \n
+  </tr>\n
+</tal:block>\n
+\n
+\n
 <tr>\n
   <td>verifyValue</td>\n
   <td>field_matrixbox_quantity_cell_0_0_0</td>\n
@@ -248,8 +282,7 @@ The field must be in the \'bottom\' group for this to work.\n
 </tbody>\n
 </table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

@@ -52,9 +52,12 @@
             <key> <string>_body</string> </key>
             <value> <string>"""Redirect to Foo_viewFormBox"""\n
 msg = "%s %s %s %s" % (id, title, quantity, description)\n
-\n
-context.Base_redirect("Foo_viewFormBox", \n
+is_gadget_style_installed = context.ERP5Site_isXHTMLGadgetStyleInstalled()\n
+if not is_gadget_style_installed:\n
+  context.Base_redirect("Foo_viewFormBox", \n
                       keep_items={\'portal_status_message\': msg})\n
+else:\n
+  context.REQUEST.RESPONSE.redirect("view?portal_status_message=%s#/Foo_viewFormBox/" %msg)\n
 </string> </value>
         </item>
         <item>
