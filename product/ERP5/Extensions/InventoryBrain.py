@@ -19,6 +19,34 @@ from zLOG import LOG, PROBLEM
 from Products.ERP5Type.Message import translateString
 from ComputedAttribute import ComputedAttribute
 
+class ComputedAttributeGetItemCompatibleMixin(ZSQLBrain):
+  """A brain that supports accessing computed attributes using __getitem__
+  protocol.
+  """
+  def __init__(self):
+    # __getitem__ returns the computed attribute directly, but if we access
+    # brain['node_title'] we expect to have the attribute after computation,
+    # not the ComputedAttribute attribue instance. Defining a __getitem__
+    # method on that class is not enough, because the brain class is not
+    # directly this class but a class created on the fly that also inherits
+    # from Record which already defines a __getitem__ method.
+    # We cannot patch the instance, because Record does not allow this kind of
+    # mutation, but as the class is created on the fly, for each query, it's
+    # safe to patch the class. See Shared/DC/ZRDB/Results.py for more detail.
+    # A Records holds a list of r instances, only the first __init__ needs to
+    # do this patching.
+    if not hasattr(self.__class__, '__super__getitem__'):
+      self.__class__.__super__getitem__ = self.__class__.__getitem__
+      self.__class__.__getitem__ =\
+        ComputedAttributeGetItemCompatibleMixin.__getitem__
+
+  # ComputedAttribute compatibility for __getitem__
+  def __getitem__(self, name):
+    item = self.__super__getitem__(name)
+    if isinstance(item, ComputedAttribute):
+      return item.__of__(self)
+    return item
+
 class InventoryBrain(ZSQLBrain):
   """
     Global analysis (all variations and categories)
@@ -75,34 +103,10 @@ class InventoryBrain(ZSQLBrain):
       return resource.getQuantityUnit()
 
 
-class InventoryListBrain(ZSQLBrain):
+class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
   """
     Lists each variation
   """
-  def __init__(self):
-    ZSQLBrain.__init__(self)
-    # __getitem__ returns the computed attribute directly, but if we access
-    # brain['node_title'] we expect to have the attribute after computation,
-    # not the ComputedAttribute attribue instance. Defining a __getitem__
-    # method on that class is not enough, because the brain class is not
-    # directly this class but a class created on the fly that also inherits
-    # from Record which already defines a __getitem__ method.
-    # We cannot patch the instance, because Record does not allow this kind of
-    # mutation, but as the class is created on the fly, for each query, it's
-    # safe to patch the class. See Shared/DC/ZRDB/Results.py for more detail.
-    # A Records holds a list of r instances, only the first __init__ needs to
-    # do this patching.
-    if not hasattr(self.__class__, '__super__getitem__'):
-      self.__class__.__super__getitem__ = self.__class__.__getitem__
-      self.__class__.__getitem__ = InventoryListBrain.__getitem__
-
-  # ComputedAttribute compatibility for __getitem__
-  def __getitem__(self, name):
-    item = self.__super__getitem__(name)
-    if isinstance(item, ComputedAttribute):
-      return item.__of__(self)
-    return item
-
   # Stock management
   def getInventory(self, **kw):
     simulation_tool = getToolByName(self, 'portal_simulation')
