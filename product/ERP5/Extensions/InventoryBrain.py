@@ -137,7 +137,7 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
                              resource_uid=self.resource_uid, **kw)
 
   def getQuantityUnit(self, **kw):
-    resource = self.portal_catalog.getObject(self.resource_uid)
+    resource = self.getResourceValue()
     if resource is not None:
       return resource.getQuantityUnit()
 
@@ -198,6 +198,7 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
   def getListItemUrl(self, cname_id, selection_index, selection_name):
     """Returns the URL for column `cname_id`. Used by ListBox
     """
+    resource = self.getResourceValue()
     if cname_id in ('getExplanationText', 'getExplanation', ):
       o = self.getObject()
       if o is not None:
@@ -213,9 +214,8 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
                   explanation.getRelativeUrl())
       else:
         return ''
-    elif getattr(self, 'resource_uid', None) is not None:
+    elif resource is not None:
       # A resource is defined, so try to display the movement list
-      resource = self.portal_catalog.getObject(self.resource_uid)
       form_name = 'Resource_viewMovementHistory'
       query_kw = {
         'variation_text': self.variation_text,
