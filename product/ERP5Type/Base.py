@@ -3042,7 +3042,7 @@ class Base( CopyContainer,
             else:
               searchable_text_list.append(method_value)
       searchable_text = ' '.join([str(x) for x in searchable_text_list])
-      return searchable_text
+      return searchable_text.strip()
 
   # Compatibility with CMF Catalog / CPS sites
   SearchableText = getSearchableText
