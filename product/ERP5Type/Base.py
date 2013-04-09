@@ -3023,7 +3023,7 @@ class Base( CopyContainer,
 
       # generated from properties methods and add explicitly defined method_ids as well 
       for searchable_text_property_id in portal_type.getSearchableTextPropertyIdList():
-        if doc.hasProperty(searchable_text_property_id):
+        if self.hasProperty(searchable_text_property_id):
           method_id = convertToUpperCase(searchable_text_property_id)
           searchable_text_method_id_list.extend(['get%s' %method_id])
 
