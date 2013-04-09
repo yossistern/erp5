@@ -91,7 +91,12 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
     try:
       return uid_cache[uid]
     except KeyError:
-      uid_cache[uid] = result = self.portal_catalog.getObject(uid)
+      result_list = self.portal_catalog(uid=uid, limit=1,
+        select_dict=dict(title=None, relative_url=None))
+      result = None
+      if result_list:
+        result = result_list[0]
+      uid_cache[uid] = result
       return result
 
   def getSectionValue(self):
@@ -100,13 +105,13 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
   def getSectionTitle(self):
     section = self.getSectionValue()
     if section is not None:
-      return section.getTitle()
+      return section.title
   section_title = ComputedAttribute(getSectionTitle, 1)
 
   def getSectionRelativeUrl(self):
     section = self.getSectionValue()
     if section is not None:
-      return section.getRelativeUrl()
+      return section.relative_url
   section_relative_url = ComputedAttribute(getSectionRelativeUrl, 1)
 
   def getNodeValue(self):
@@ -115,13 +120,13 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
   def getNodeTitle(self):
     node = self.getNodeValue()
     if node is not None:
-      return node.getTitle()
+      return node.title
   node_title = ComputedAttribute(getNodeTitle, 1)
 
   def getNodeRelativeUrl(self):
     node = self.getNodeValue()
     if node is not None:
-      return node.getRelativeUrl()
+      return node.relative_url
   node_relative_url = ComputedAttribute(getNodeRelativeUrl, 1)
 
   def getResourceValue(self):
@@ -130,13 +135,13 @@ class InventoryListBrain(ComputedAttributeGetItemCompatibleMixin):
   def getResourceTitle(self):
     resource = self.getResourceValue()
     if resource is not None:
-      return resource.getTitle()
+      return resource.title
   resource_title = ComputedAttribute(getResourceTitle, 1)
 
   def getResourceRelativeUrl(self):
     resource = self.getResourceValue()
     if resource is not None:
-      return resource.getRelativeUrl()
+      return resource.relative_url
   resource_relative_url = ComputedAttribute(getResourceRelativeUrl, 1)
 
   def getListItemUrl(self, cname_id, selection_index, selection_name):
