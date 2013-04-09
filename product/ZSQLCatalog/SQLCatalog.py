@@ -2408,6 +2408,10 @@ class Catalog(Folder,
         LOG('SQLCatalog', WARNING, 'order_by_list and sort_order were given, ignoring sort_order.')
       if order_by_expression is not None:
         LOG('SQLCatalog', WARNING, 'order_by_list and order_by_expression were given, ignoring order_by_expression.')
+    if order_by_list and not implicit_join:
+      left_join_list = tuple(left_join_list) + tuple(
+         sort_param[0] for sort_param in order_by_list)
+
     # Handle from_expression
     from_expression = kw.pop('from_expression', None)
     # Handle where_expression

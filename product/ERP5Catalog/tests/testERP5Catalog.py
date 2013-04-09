@@ -853,6 +853,22 @@ class TestERP5Catalog(ERP5TypeTestCase, LogInterceptor):
               'sort_on parameter must be taken into account even if related key '
               'is not a parameter of the current query')
 
+  def test_sortOnRelatedKeyWithUnsetRelation(self):
+    """
+      Check that sorting on a related key does not filter out objects for
+      which the relation is not set.
+    """
+    portal = self.getPortalObject()
+    organisation = portal.organisation_module.\
+                   newContent(portal_type="Organisation")
+    person_module = portal.person_module
+    person_1 = person_module.newContent(portal_type="Person")
+    person_2 = person_module.newContent(portal_type="Person",
+                 career_subordination_value=organisation)
+    self.tic()
+    self.assertEqual(len(person_module.searchFolder()),
+                     len(person_module.searchFolder(sort_on=[('subordination_title', 'ascending')])))
+
 
   def _makeOrganisation(self, **kw):
     """Creates an Organisation in it's default module and reindex it.
@@ -3408,23 +3424,6 @@ VALUES
     self.tic()
     result = folder.portal_catalog(portal_type=portal_type, reference='doc %', description='%')
     self.assertEqual(len(result), 2)
-
-  @todo_erp5
-  def test_sortOnRelatedKeyWithUnsetRelation(self):
-    """
-      Check that sorting on a related key does not filter out objects for
-      which the relation is not set.
-    """
-    portal = self.getPortalObject()
-    organisation = portal.organisation_module.\
-                   newContent(portal_type="Organisation")
-    person_module = portal.person_module
-    person_1 = person_module.newContent(portal_type="Person")
-    person_2 = person_module.newContent(portal_type="Person",
-                 career_subordination_value=organisation)
-    self.tic()
-    self.assertEqual(len(person_module.searchFolder()),
-                     len(person_module.searchFolder(sort_on=[('subordination_title', 'ascending')])))
 
   def test_multipleRelatedKeyDoMultipleJoins(self):
     """
