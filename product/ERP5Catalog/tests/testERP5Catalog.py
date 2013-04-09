@@ -542,6 +542,7 @@ class TestERP5Catalog(ERP5TypeTestCase, LogInterceptor):
 
   # TODO: this test is disabled (and maybe not complete), because this feature
   # is not implemented
+  @todo_erp5
   def test_18_buildSQLQueryAnotherTable(self):
     """Tests that buildSQLQuery works with another query_table than 'catalog'"""
     portal = self.getPortal()
