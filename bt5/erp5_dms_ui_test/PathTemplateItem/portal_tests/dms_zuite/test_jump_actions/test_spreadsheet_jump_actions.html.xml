@@ -53,7 +53,7 @@
         <td>base_url</td>\n
 </tr>\n
 <tr>\n
-        <td>open</td>\n
+        <td>openAndWait</td>\n
         <td>${base_url}/document_module/view</td>\n
         <td></td>\n
 </tr>\n
@@ -61,6 +61,11 @@
         <td>selectAndWait</td>\n
         <td>select_action</td>\n
         <td>label=Add Spreadsheet</td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'transition_message\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
         <td>assertTextPresent</td>\n
@@ -140,8 +145,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>
