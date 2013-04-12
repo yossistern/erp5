@@ -127,6 +127,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@alt=\'Planning\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@alt=\'Planning\']</td>\n
   <td></td>\n
@@ -136,11 +141,21 @@
   <td>Site Error</td>\n
   <td></td>\n
 </tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@name=\'JumpToCurrentDay\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
 <!-- Make sure that we are working with currently date -->\n
 <tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@name=\'JumpToCurrentDay\']</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'lane_path\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>selectAndWait</td>\n
@@ -151,6 +166,11 @@
   <td>assertTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_lane_1\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>assertText</td>\n
@@ -228,6 +248,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_1_activity_1_block_1\']/div[@class=\'planning_box_center\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>verifyText</td>\n
   <td>//div[@id="group_1_activity_1_block_1"]/div[@class="planning_box_center"]</td>\n
   <td>.</td>\n
@@ -243,6 +268,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_1_activity_1_block_1\']/div[@class=\'planning_box_center\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>verifyText</td>\n
   <td>//div[@id="group_1_activity_1_block_1"]/div[@class="planning_box_center"]</td>\n
   <td>Title 0</td>\n
@@ -256,6 +286,11 @@
   <td>assertTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_1_activity_1_block_1\']/div[@class=\'planning_box_center\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyText</td>\n
@@ -276,8 +311,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

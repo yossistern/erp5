@@ -128,6 +128,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@alt=\'Planning\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@alt=\'Planning\']</td>\n
   <td></td>\n
@@ -137,11 +142,21 @@
   <td>Site Error</td>\n
   <td></td>\n
 </tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@name=\'JumpToCurrentDay\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
 <!-- Make sure that we are working with currently date -->\n
 <tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@name=\'JumpToCurrentDay\']</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_lane_1\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyText</td>\n
@@ -184,6 +199,11 @@
   <td tal:content="python: \'%s %02d/%02d 21:00\' % (now.Day(), now.month(), now.day())"> </td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'lane_path\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>lane_path</td>\n
   <td>label=Year</td>\n
@@ -192,6 +212,11 @@
   <td>verifyTextNotPresent</td>\n
   <td>Site Error</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_lane_1\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyText</td>\n
@@ -252,6 +277,11 @@
   <td>verifyText</td>\n
   <td>//div[@id="group_lane_12"]</td>\n
   <td tal:content="string:December $year"> </td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'lane_path\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>selectAndWait</td>\n
@@ -319,6 +349,11 @@
   <td tal:content="string:$year/01/31"/>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'lane_path\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>lane_path</td>\n
   <td>label=Day</td>\n
@@ -342,8 +377,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

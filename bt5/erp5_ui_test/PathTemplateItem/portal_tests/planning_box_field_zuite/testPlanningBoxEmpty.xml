@@ -77,6 +77,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@alt=\'Planning\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@alt=\'Planning\']</td>\n
   <td></td>\n
@@ -90,8 +95,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-
+</html>
 
 ]]></unicode> </value>
         </item>

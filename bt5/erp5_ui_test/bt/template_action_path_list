@@ -4,6 +4,8 @@ Bar | performance
 Bar | view
 Foo Bar Module | view
 Foo Line | view
+Foo Line | view_dynamic_matrix_box
+Foo Line | view_matrix_box
 Foo Module | list
 Foo Module | list_ui
 Foo Module | search

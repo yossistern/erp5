@@ -117,6 +117,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//img[@alt=\'Planning\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>clickAndWait</td>\n
   <td>//img[@alt=\'Planning\']</td>\n
   <td></td>\n
@@ -132,6 +137,11 @@
   <td></td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'report_root_url\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>//select[@name=\'report_root_url\']</td>\n
   <td>foo_domain</td>\n
@@ -140,6 +150,11 @@
   <td>assertTextNotPresent</td>\n
   <td>SiteError</td>\n
   <td></td>\n
+</tr>\n
+<tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//div[@id=\'group_2\']")</td>\n
+  <td>30000</td> \n
 </tr>\n
 <tr>\n
   <td>verifyText</td>\n
@@ -227,6 +242,11 @@
   <td>Title 2</td>\n
 </tr>\n
 <tr>\n
+  <td>waitForCondition</td>\n
+  <td>selenium.isElementPresent("//select[@name=\'report_root_url\']")</td>\n
+  <td>30000</td> \n
+</tr>\n
+<tr>\n
   <td>selectAndWait</td>\n
   <td>//select[@name=\'report_root_url\']</td>\n
   <td>parent</td>\n
@@ -240,9 +260,7 @@
 \n
 </tbody></table>\n
 </body>\n
-</html>\n
-\n
-
+</html>
 
 ]]></unicode> </value>
         </item>
