@@ -8,7 +8,7 @@
       <dictionary>
         <item>
             <key> <string>_EtagSupport__etag</string> </key>
-            <value> <string>ts65161220.11</string> </value>
+            <value> <string>ts65765241.12</string> </value>
         </item>
         <item>
             <key> <string>__name__</string> </key>
@@ -249,6 +249,13 @@ var ERP5Form = ( function () {\n
                       /* FormBox field */\n
                       var matrix_box_dom = $("#field_"+field_id);\n
                       matrix_box_dom.html(field_dict.value);\n
+          },\n
+\n
+          PlanningBox: function (field_id, field_dict) {\n
+                      /* Planning field */\n
+                      var planning_box_dom = $("#field_"+field_id);\n
+                      planning_box_dom.html(field_dict.value);\n
+\n
           },\n
 \n
           RelationStringField: function (field_id, field_dict) {\n
@@ -514,7 +521,7 @@ var ERP5Form = ( function () {\n
         </item>
         <item>
             <key> <string>size</string> </key>
-            <value> <int>23875</int> </value>
+            <value> <int>24121</int> </value>
         </item>
         <item>
             <key> <string>title</string> </key>

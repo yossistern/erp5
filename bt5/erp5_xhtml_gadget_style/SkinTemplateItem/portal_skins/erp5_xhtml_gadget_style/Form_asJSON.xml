@@ -74,7 +74,7 @@ for field_id in form.get_field_ids():\n
   \n
   field_value = \'\'\n
   # some special cases\n
-  if not field_meta_type in ["MatrixBox", "FormBox"]:\n
+  if not field_meta_type in ["MatrixBox", "FormBox", "PlanningBox"]:\n
     field_value = original_field.get_value("default")\n
 \n
   field_dict = result[\'form_data\'][field_id] = {}\n
@@ -130,7 +130,13 @@ for field_id in form.get_field_ids():\n
     field_value = formbox_form(key_prefix=\'field_%s\' %field_id)\n
 \n
   if field_meta_type in ["MatrixBox"]:\n
+    # we need to explicitly set it here, usually done by PT\n
     context.REQUEST.set(\'here\', context)\n
+    field_value = field.render_htmlgrid(None, context.REQUEST, render_prefix=\'\', key_prefix=\'\')[0][1]\n
+\n
+  if field_meta_type in ["PlanningBox"]:\n
+    # we need to call it as it leaves some structures in REQUEST (for optimization purposes)\n
+    field.render_css(context.REQUEST)\n
     field_value = field.render_htmlgrid(None, context.REQUEST, render_prefix=\'\', key_prefix=\'\')[0][1]\n
 \n
   # add field value\n

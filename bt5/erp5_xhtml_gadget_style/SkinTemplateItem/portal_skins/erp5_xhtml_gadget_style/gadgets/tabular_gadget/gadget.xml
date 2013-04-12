@@ -49,8 +49,10 @@
                  current_action   python: portal.ERP5Site_getCurrentAction(current_url, actions);\n
                  actions actions/object_view | python: [];\n
                  action_id_list python:[x[\'url\'].split(\'/\')[-1] for x in actions];\n
+                 default_tab_url python: current_form_id;\n
+                 dummy python:  test(current_form_id not in action_id_list, action_id_list.append(current_form_id), \'\');\n
                  data_gadget_property python: {\'tab_container_id\': \'form_gadget\',\n
-                                               \'default_tab_url\': action_id_list[0],\n
+                                               \'default_tab_url\': default_tab_url,\n
                                                \'action_id_list\': action_id_list}">\n
   <div class="document">\n
 \n
