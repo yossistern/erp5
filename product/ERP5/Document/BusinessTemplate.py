@@ -1409,7 +1409,7 @@ class PathTemplateItem(ObjectTemplateItem):
       obj = p.unrestrictedTraverse(path)
 
       try:
-        portal_type = obj.getPortalType()
+        portal_type = aq_base(obj).getPortalType()
       except Exception, e:
         LOG("BusinessTemplate", WARNING,
             "Could not update Local Roles as Portal Type for '%s' is not "
