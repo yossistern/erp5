@@ -1,2 +1,2 @@
-scalability-testnode
+scalability_testnode
 --------

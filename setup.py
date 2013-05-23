@@ -66,7 +66,7 @@ setup(name=name,
       entry_points={
         'console_scripts': [
           'testnode = erp5.util.testnode:main [testnode]',
-          'scalability_testnode = erp5.util.scalability_testnode:main [scalability-testnode]',
+          'scalability_testnode = erp5.util.scalability_testnode:main [scalability_testnode]',
           'performance_tester_erp5 = '\
             'erp5.util.benchmark.performance_tester:main [benchmark]',
           'scalability_tester_erp5 = '\
