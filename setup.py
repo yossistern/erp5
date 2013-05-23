@@ -53,7 +53,7 @@ setup(name=name,
       ],
       extras_require={
         'testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
-        'scalability-testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
+        'scalability_testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
         'testbrowser': ['zope.testbrowser >= 3.11.1', 'z3c.etestbrowser'],
         'benchmark': benchmark_install_require_list,
         'benchmark-report': [name+'[benchmark]', 'matplotlib', 'numpy'],
@@ -66,7 +66,7 @@ setup(name=name,
       entry_points={
         'console_scripts': [
           'testnode = erp5.util.testnode:main [testnode]',
-          'scalability-testnode = erp5.util.scalability-testnode:main [scalability-testnode]',
+          'scalability_testnode = erp5.util.scalability_testnode:main [scalability-testnode]',
           'performance_tester_erp5 = '\
             'erp5.util.benchmark.performance_tester:main [benchmark]',
           'scalability_tester_erp5 = '\
