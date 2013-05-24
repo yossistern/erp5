@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import glob
 import os
 
-version = '0.4.34'
+version = '0.9.9'
 name = 'erp5.util'
 long_description = open("README.erp5.util.txt").read() + "\n"
 
@@ -52,7 +52,7 @@ setup(name=name,
         'psutil >= 0.5.0',
       ],
       extras_require={
-        'testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
+#        'testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
         'scalability_testnode': ['slapos.core', 'xml_marshaller', 'psutil >= 0.5.0'],
         'testbrowser': ['zope.testbrowser >= 3.11.1', 'z3c.etestbrowser'],
         'benchmark': benchmark_install_require_list,
@@ -65,7 +65,7 @@ setup(name=name,
       include_package_data=True,
       entry_points={
         'console_scripts': [
-          'testnode = erp5.util.testnode:main [testnode]',
+#          'testnode = erp5.util.testnode:main [testnode]',
           'scalability_testnode = erp5.util.scalability_testnode:main [scalability_testnode]',
           'performance_tester_erp5 = '\
             'erp5.util.benchmark.performance_tester:main [benchmark]',
