@@ -77,7 +77,7 @@ def main(*args):
               'log_directory','run_directory','proxy_host','proxy_port',
               'git_binary','zip_binary','node_quantity','test_node_title',
               'ipv4_address','ipv6_address','test_suite_master_url',
-              'slapos-account-key', 'slapos-account-certificate',
+              'slapos_account_key', 'slapos_account_certificate',
               'slapgrid_partition_binary','slapgrid_software_binary',
               'slapproxy_binary', 'httpd_ip', 'httpd_port'):
     CONFIG[key] = config.get('scalability_testnode',key)
