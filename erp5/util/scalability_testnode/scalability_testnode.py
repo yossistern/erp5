@@ -429,16 +429,53 @@ branch = %(branch)s
     self._cleanupTemporaryFiles()
 
   def run(self):
-    print "OKAY"
-    return
+    print "run"
+    return   
     log = self.log
     config = self.config
-    slapgrid = None
-    previous_revision_dict = {}
-    revision_dict = {}
-    test_result = None
-    test_node_slapos = SlapOSInstance()
-    test_node_slapos.edit(working_directory=self.config['slapos_directory'])
+
+    # Move this into __init__.py script ?
+    # create directory and files in order to have an acces to the slapos account
+#    test_node_slapos = SlapOSInstance()
+#    test_node_slapos.edit(working_directory=self.config['slapos_directory'])
+    # main slapos cfg directory 
+#    slapos_account_directory = os.path.join(test_node_slapos.working_directory, "slapos_account")
+#    SlapOSControler.createFolder(slapos_account_directory)
+    # create files
+#    slapos_account_key_path = os.path.join(slapos_account_directory, "key")
+#    slapos_account_certificate_path = os.path.join(slapos_account_directory, "certificate")
+#    slapos_account_slapos_cfg_path = os.path.join(slapos_account_directory, "slapos.cfg")
+
+#    slapos_account_key_value = config['slapos_account_key'].replace('\\n', '\n')
+#    slapos_account_certificate_value = config['slapos_account_certificate'].replace('\\n', '\n')
+#    slapos_account_slapos_cfg_value = "[slapos]\nmaster_url = %s\n\
+#[slapconsole]\ncert_file = %s\nkey_file = %s" %("https://slap.vifib.com/",
+#                                      slapos_account_certificate_path, slapos_account_key_path)
+
+#    SlapOSControler.createFile(slapos_account_key_path, "w", slapos_account_key_value)
+#    SlapOSControler.createFile(slapos_account_certificate_path, "w", slapos_account_certificate_value)
+#    SlapOSControler.createFile(slapos_account_slapos_cfg_path, "w", slapos_account_slapos_cfg_value)
+
+#    self.log = self.process_manager.log = self.testnode_log
+#    self.cleanUp(None)
+
+#    print "Key : %s" %slapos_account_key_value
+#    print "----------------------------------"
+#    print "Certificate : %s" %slapos_account_certificate_value
+
+#    print "config :"
+#    print config
+#    for x in config :
+#      print "%s :" %(x)
+#      print config[x]
+#      print "-----------------------"  
+
+#    xxconfig = Config(args, slapos_account_slapos_cfg_path)
+#    _supply("/opt/slapdev/software/kvm/software.cfg", "COMP-1412", init(xxconfig))
+
+
+    return
+
     try:
       while True:
         try:

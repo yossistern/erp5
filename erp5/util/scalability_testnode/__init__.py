@@ -109,5 +109,25 @@ def main(*args):
     CONFIG['software_list'] = filter(None,
         config.get("software_list", "path_list").split(","))
 
+
+  # Create "slapos_account" directory in the "slapos_directory"
+  slapos_account_directory = os.path.join(CONFIG['slapos_directory'], "slapos_account")
+  SlapOSControler.createFolder(slapos_account_directory)
+  # Create slapos-account files
+  slapos_account_key_path = os.path.join(slapos_account_directory, "key")
+  slapos_account_certificate_path = os.path.join(slapos_account_directory, "certificate")
+  slapos_account_slapos_cfg_path = os.path.join(slapos_account_directory, "slapos.cfg")
+  CONFIG['slapos_account_key_path'] = slapos_account_key_path
+  CONFIG['slapos_account_certificate_path'] = slapos_account_certificate_path
+  CONFIG['slapos_account_slapos_cfg_path'] = slapos_account_slapos_cfg_path
+  slapos_account_key_value = CONFIG['slapos_account_key'].replace('\\n', '\n')
+  slapos_account_certificate_value = CONFIG['slapos_account_certificate'].replace('\\n', '\n')
+  slapos_account_slapos_cfg_value = "[slapos]\nmaster_url = %s\n\
+[slapconsole]\ncert_file = %s\nkey_file = %s" %("https://slap.vifib.com/",
+                                    slapos_account_certificate_path, slapos_account_key_path)
+  SlapOSControler.createFile(slapos_account_key_path, "w", slapos_account_key_value)
+  SlapOSControler.createFile(slapos_account_certificate_path, "w", slapos_account_certificate_value)
+  SlapOSControler.createFile(slapos_account_slapos_cfg_path, "w", slapos_account_slapos_cfg_value)
+
   testnode = TestNode(logger.info, CONFIG)
   testnode.run()

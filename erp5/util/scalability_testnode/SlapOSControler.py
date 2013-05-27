@@ -47,6 +47,16 @@ def createFolders(folder):
   if not(os.path.exists(folder)):
     os.makedirs(folder)
 
+def createFile(path, mode, content):
+  f = open(path, mode)
+  if os.path.exists(path):
+    f.write(content)
+    f.close()
+  else:
+    # error
+    pass
+
+
 class SlapOSControler(object):
 
   def __init__(self, working_directory, config, log):
@@ -56,6 +66,10 @@ class SlapOSControler(object):
     self.slapos_config = os.path.join(working_directory, 'slapos.cfg')
     self.proxy_database = os.path.join(working_directory, 'proxy.db')
     self.log = log
+    print self.software_root
+    print self.instance_root
+    print self.slapos_config
+    print self.proxy_database
 
   def _resetSoftware(self):
     self.log('SlapOSControler : GOING TO RESET ALL SOFTWARE : %r' %
