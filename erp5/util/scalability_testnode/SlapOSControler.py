@@ -27,6 +27,11 @@
 import os
 import pkg_resources
 import slapos.slap
+
+from slapos import client
+import argparse
+import ConfigParser
+
 import subprocess
 import time
 import xml_marshaller
@@ -66,10 +71,18 @@ class SlapOSControler(object):
     self.slapos_config = os.path.join(working_directory, 'slapos.cfg')
     self.proxy_database = os.path.join(working_directory, 'proxy.db')
     self.log = log
-    print self.software_root
-    print self.instance_root
-    print self.slapos_config
-    print self.proxy_database
+
+  def _supply(self, configuration_file_path, software_url, computer_id):
+    self.log('SlapOSControler : _supply')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("configuration_file",help="SlapOS configuration file")
+    parser.add_argument("software_url", help="Your software url")
+    parser.add_argument("node", help="Target node")
+    args = parser.parse_args([configuration_file_path, software_url, computer_id])
+    config = client.Config(args, args.configuration_file)
+    client._supply(args.software_url, args.node, client.init(config)) 
+    self.log('SlapOSControler : _supply end')
+
 
   def _resetSoftware(self):
     self.log('SlapOSControler : GOING TO RESET ALL SOFTWARE : %r' %
