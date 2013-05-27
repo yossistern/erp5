@@ -31,6 +31,8 @@ import slapos.slap
 from slapos import client
 import argparse
 import ConfigParser
+import pprint
+from slapos.slap import ResourceNotReady
 
 import subprocess
 import time
@@ -73,15 +75,51 @@ class SlapOSControler(object):
     self.log = log
 
   def _supply(self, configuration_file_path, software_url, computer_id):
+    """
+    Ex :
+    slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
+    """
     self.log('SlapOSControler : _supply')
     parser = argparse.ArgumentParser()
-    parser.add_argument("configuration_file",help="SlapOS configuration file")
-    parser.add_argument("software_url", help="Your software url")
-    parser.add_argument("node", help="Target node")
-    args = parser.parse_args([configuration_file_path, software_url, computer_id])
+    parser.add_argument("configuration_file")
+    parser.add_argument("software_url")
+    parser.add_argument("node")
+    if  os.path.exists(configuration_file_path):
+      args = parser.parse_args([configuration_file_path, software_url, computer_id])
+      config = client.Config(args, args.configuration_file)
+      client._supply(args.software_url, args.node, client.init(config)) 
+    else:
+      raise ValueError("Configuration file not found.")
+
+  def _request(self, configuration_file_path, reference,
+          software_url, software_type, software_configuration):
+    """
+    configuration_file_path (slapos acount)
+    reference : instance name
+    software_url
+    software_type : cluster/single
+    software_configuration : dict { "_" : "{'toto' : 'titi'}" } 
+
+    Ex :
+    slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
+                               'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } )
+
+    """
+    self.log('SlapOSControler : _request')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("configuration_file")
+    args = parser.parse_args([configuration_file_path])
     config = client.Config(args, args.configuration_file)
-    client._supply(args.software_url, args.node, client.init(config)) 
-    self.log('SlapOSControler : _supply end')
+    local = client.init(config) 
+    try:
+      partition = local['slap'].registerOpenOrder().request(
+        software_release = software_url,
+        partition_reference = reference,
+        partition_parameter_kw = software_configuration,
+        software_type = software_type,
+      )
+#      print "Instance requested.\nState is : %s." % partition.getState()
+# Is it possible to have the true state of the instance with getState() ?
 
 
   def _resetSoftware(self):
@@ -91,7 +129,6 @@ class SlapOSControler(object):
       shutil.rmtree(self.software_root)
     os.mkdir(self.software_root)
     os.chmod(self.software_root, 0750)
-
 
   def initializeSlapOSControler(self, slapproxy_log=None, process_manager=None,
         reset_software=False, software_path_list=None):

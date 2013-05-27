@@ -435,9 +435,11 @@ branch = %(branch)s
     slapos_controler = SlapOSControler.SlapOSControler(
                 config['working_directory'], config, log)
 
-    print "before"
-    slapos_controler._supply( config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-1412')
-    print "after"
+#    slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
+    slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
+                               'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
+
+
     return
 
     try:
