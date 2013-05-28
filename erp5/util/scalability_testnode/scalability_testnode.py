@@ -400,13 +400,8 @@ branch = %(branch)s
     # 2: configure apache to allow acces to it from outside
     # 3: install software this the ipv6 address made to access to soft.cfg
     # 4: ok?
-   
-    portal_url = self.config['test_suite_master_url']
-    test_suite_portal = taskdistribution.TaskDistributor(portal_url,
-                                          logger=DummyLogger(self.log))    
-    print "test_suite_portal:"
-    print test_suite_portal
-    test_suite_json =  test_suite_portal.startTestSuite(self.config['test_node_title'])
+      
+    test_suite_json = self.distributor.startTestSuite(self.config['test_node_title'])
     print "test_suite_json:"
     print test_suite_json
     test_suite_data = deunicodeData(json.loads(test_suite_json))
@@ -434,7 +429,7 @@ branch = %(branch)s
       # as partitions can be of any kind we have and likely will never have
       # a reliable way to check if they are up or not ...
       time.sleep(20)
-      self.runTestSuite(node_test_suite,portal_url)
+      self.runTestSuite(node_test_suite, self.portal_url)
 
     print "EndMaster"
 
@@ -460,7 +455,7 @@ branch = %(branch)s
     # OptimizeConfiguration (select master + aggregate test_suite)
     self.distributor.optimizeConfiguration()
    
-    return 
+  
     # TODO : (Put the code below into a loop)
 
     # Determine master and do job
