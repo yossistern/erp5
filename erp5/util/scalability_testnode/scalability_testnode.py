@@ -42,6 +42,8 @@ from subprocess import CalledProcessError
 from Updater import Updater
 from erp5.util import taskdistribution
 
+import xmlrpclib
+
 DEFAULT_SLEEP_TIMEOUT = 120 # time in seconds to sleep
 MAX_LOG_TIME = 15 # time in days we should keep logs that we can see through
                   # httd
@@ -428,19 +430,50 @@ branch = %(branch)s
     self._cleanupLog()
     self._cleanupTemporaryFiles()
 
+  def _runAsMaster(self):
+    pass
+
+  def _runAsSlave(self):
+    pass
+
   def run(self):
     print "run"
-    config = self.config
-    log = self.log
     slapos_controler = SlapOSControler.SlapOSControler(
-                config['working_directory'], config, log)
+         self.config['working_directory'], self.config, self.log)
 
+    # how to use SlapOSControler :
 #    slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
-    slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
-                               'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
+#    slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
+#                               'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
+
+    # TODO : change paramters to don't have to put identifiants/url here
+    portal_url = self.config['test_suite_master_url']
+    erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
+
+    self.portal = xmlrpclib.ServerProxy(erp5_url, verbose=True, allow_none=True)
+    # TODO : on sever side (or here if it is possible) create a more beautiful way to get the node list
+    nodes = self.portal.test_node_module.test_node_ben()
+ 
+
+    # what if there are no test_node recorded into ERP5 Master ?
+    # what if there are several nodes with the same title ?
+    # categories test <=> distributor filter
+    self.current_node = [ node for node in nodes if node['title'] == self.config['test_node_title'] ][0]
+    self.master_node = [ node for node in nodes
+                          if ( node['master'] == True ) and
+                          ( node['categories'] == current_node['categories'] ) ][0]
+    self.involved_nodes = [ node for node in nodes if node[ ][0]
+
+    # 
+    if master_node['title'] == current_node['title']:
+      _runAsMaster()
+    else:
+      _runAsSlave()
 
 
     return
+
+
 
     try:
       while True:

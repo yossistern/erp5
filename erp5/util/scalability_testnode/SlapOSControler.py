@@ -111,20 +111,16 @@ class SlapOSControler(object):
     args = parser.parse_args([configuration_file_path])
     config = client.Config(args, args.configuration_file)
     local = client.init(config) 
-    try:
-      partition = local['slap'].registerOpenOrder().request(
+    partition = local['slap'].registerOpenOrder().request(
         software_release = software_url,
         partition_reference = reference,
         partition_parameter_kw = software_configuration,
-        software_type = software_type,
-      )
-#      print "Instance requested.\nState is : %s." % partition.getState()
-# Is it possible to have the true state of the instance with getState() ?
-
+        software_type = software_type)
+    #      print "Instance requested.\nState is : %s." % partition.getState()
+    # Is it possible to have the true state of the instance with getState() ?
 
   def _resetSoftware(self):
-    self.log('SlapOSControler : GOING TO RESET ALL SOFTWARE : %r' %
-             (self.software_root,))
+    self.log('SlapOSControler : GOING TO RESET ALL SOFTWARE : %r' % (self.software_root,))
     if os.path.exists(self.software_root):
       shutil.rmtree(self.software_root)
     os.mkdir(self.software_root)
