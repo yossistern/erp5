@@ -158,10 +158,14 @@ class TestNode(object):
        os.remove(fpath)
 
   def getNodeTestSuite(self, reference):
+    print "getNodeTestSuite"
     node_test_suite = self.node_test_suite_dict.get(reference)
     if node_test_suite is None:
+      print "node_test_suite is None"
       node_test_suite = NodeTestSuite(reference)
       self.node_test_suite_dict[reference] = node_test_suite
+    print "return:"
+    print node_test_suite
     return node_test_suite
 
   def delNodeTestSuite(self, reference):
@@ -285,59 +289,6 @@ branch = %(branch)s
       updater.checkout()
       node_test_suite.revision = test_result.revision
 
-  def _prepareSlapOS(self, working_directory, slapos_instance, log,
-          create_partition=1, software_path_list=None, **kw):
-    """
-    Launch slapos to build software and partitions
-    """
-    slapproxy_log = os.path.join(self.config['log_directory'],
-                                  'slapproxy.log')
-    log('Configured slapproxy log to %r' % slapproxy_log)
-    reset_software = slapos_instance.retry_software_count > 10
-    if reset_software:
-      slapos_instance.retry_software_count = 0
-    log('testnode, retry_software_count : %r' % \
-             slapos_instance.retry_software_count)
-    self.slapos_controler = SlapOSControler.SlapOSControler(
-      working_directory, self.config, log)
-    self.slapos_controler.initializeSlapOSControler(slapproxy_log=slapproxy_log,
-       process_manager=self.process_manager, reset_software=reset_software,
-       software_path_list=software_path_list)
-    self.process_manager.supervisord_pid_file = os.path.join(\
-         self.slapos_controler.instance_root, 'var', 'run', 'supervisord.pid')
-    method_list= ["runSoftwareRelease"]
-    if create_partition:
-      method_list.append("runComputerPartition")
-    for method_name in method_list:
-      slapos_method = getattr(self.slapos_controler, method_name)
-      status_dict = slapos_method(self.config,
-                                  environment=self.config['environment'],
-                                 )
-      if status_dict['status_code'] != 0:
-         slapos_instance.retry = True
-         slapos_instance.retry_software_count += 1
-         raise SubprocessError(status_dict)
-      else:
-         slapos_instance.retry_software_count = 0
-    return status_dict
-
-  def prepareSlapOSForTestNode(self, test_node_slapos):
-    """
-    We will build slapos software needed by the testnode itself,
-    like the building of selenium-runner by default
-    """
-    return self._prepareSlapOS(self.config['slapos_directory'],
-              test_node_slapos, self.log, create_partition=0,
-              software_path_list=self.config.get("software_list"))
-
-  def prepareSlapOSForTestSuite(self, node_test_suite):
-    log = self.log
-    if log is None:
-      log = self.log
-    return self._prepareSlapOS(node_test_suite.working_directory,
-              node_test_suite, log,
-              software_path_list=[node_test_suite.custom_profile_path])
-
   def _dealShebang(self,run_test_suite_path):
     line = open(run_test_suite_path, 'r').readline()
     invocation_list = []
@@ -449,26 +400,74 @@ branch = %(branch)s
     # 2: configure apache to allow acces to it from outside
     # 3: install software this the ipv6 address made to access to soft.cfg
     # 4: ok?
+   
+    portal_url = self.config['test_suite_master_url']
+    test_suite_portal = taskdistribution.TaskDistributor(portal_url,
+                                          logger=DummyLogger(self.log))    
+    print "test_suite_portal:"
+    print test_suite_portal
+    test_suite_json =  test_suite_portal.startTestSuite(self.config['test_node_title'])
+    print "test_suite_json:"
+    print test_suite_json
+    test_suite_data = deunicodeData(json.loads(test_suite_json))
+    print "test_suite_data:"
+    print test_suite_data
+    self.checkOldTestSuite(test_suite_data)
 
-    
+    for test_suite in test_suite_data:
+      print "test_suite:"
+      print test_suite
+      node_test_suite = self.getNodeTestSuite(test_suite["test_suite_reference"])
+      node_test_suite.edit(
+           working_directory=self.config['working_directory'],
+           log_directory=self.config['log_directory'])
+      node_test_suite.edit(**test_suite)
+      # Write our own software.cfg to use the local repository
+      self.constructProfile(node_test_suite)
+      self.getAndUpdateFullRevisionList(node_test_suite)
+ 
+      self.registerSuiteLog(test_result, node_test_suite)
+      self.checkRevision(test_result,node_test_suite)
+      # Now prepare the installation of SlapOS and create instance
+      status_dict = self.prepareSlapOSForTestSuite(node_test_suite)
+      # Give some time so computer partitions may start
+      # as partitions can be of any kind we have and likely will never have
+      # a reliable way to check if they are up or not ...
+      time.sleep(20)
+      self.runTestSuite(node_test_suite,portal_url)
 
-
-    pass
+    print "EndMaster"
 
 
   def _runAsSlave(self):
     print "I'm a slave"
-    pass
-
+    
 
   def run(self):
-    # TODO : change paramters to don't have to put identifiants/url here
-    portal_url = self.config['test_suite_master_url']
-    erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
 
-    self.portal = xmlrpclib.ServerProxy(erp5_url, verbose=False, allow_none=True)
+    # Get portal
+    self.erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
+    self.portal = xmlrpclib.ServerProxy(self.erp5_url, verbose=False, allow_none=True) 
+    # Get access to the distributor
+    self.portal_url = self.config['test_suite_master_url']
+    self.distributor = xmlrpclib.ServerProxy(
+                             self.config['test_suite_master_url'],
+                             verbose=False, allow_none=True)
+
+    # Node subscription
+    self.distributor.nodeSubscription(self.config['test_node_title'])
+
+    # OptimizeConfiguration (select master + aggregate test_suite)
+    self.distributor.optimizeConfiguration()
+   
+    return 
+    # TODO : (Put the code below into a loop)
+
+    # Determine master and do job
+
     # TODO : on sever side (or here if it is possible) create
     # a more beautiful way to get the node list
+    # This command return empty list sometimes, why ?
     nodes = self.portal.test_node_module.test_node_ben() 
 
     # what if there are no node recorded into ERP5 Master ?
@@ -482,12 +481,13 @@ branch = %(branch)s
                and ( node['categories'] == self.current_node['categories'] ) ][0]
     self.involved_nodes = [ node for node in nodes
                if ( node['categories'] == self.current_node['categories'] ) ]
+
     # Master/Slave 
     if self.current_node['title'] == self.master_node['title']:
       self._runAsMaster()
     else:
       self._runAsSlave()
 
-
+    print "End."
     return
 
