@@ -431,9 +431,11 @@ branch = %(branch)s
     self._cleanupTemporaryFiles()
 
   def _runAsMaster(self):
+    print "I'm the master"
     pass
 
   def _runAsSlave(self):
+    print "I'm a slave"
     pass
 
   def run(self):
@@ -450,7 +452,7 @@ branch = %(branch)s
     portal_url = self.config['test_suite_master_url']
     erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
 
-    self.portal = xmlrpclib.ServerProxy(erp5_url, verbose=True, allow_none=True)
+    self.portal = xmlrpclib.ServerProxy(erp5_url, verbose=False, allow_none=True)
     # TODO : on sever side (or here if it is possible) create a more beautiful way to get the node list
     nodes = self.portal.test_node_module.test_node_ben()
  
@@ -461,14 +463,15 @@ branch = %(branch)s
     self.current_node = [ node for node in nodes if node['title'] == self.config['test_node_title'] ][0]
     self.master_node = [ node for node in nodes
                           if ( node['master'] == True ) and
-                          ( node['categories'] == current_node['categories'] ) ][0]
-    self.involved_nodes = [ node for node in nodes if node[ ][0]
+                          ( node['categories'] == self.current_node['categories'] ) ][0]
+    self.involved_nodes = [ node for node in nodes
+                          if ( node['categories'] == self.current_node['categories'] ) ][0]
 
     # 
-    if master_node['title'] == current_node['title']:
-      _runAsMaster()
+    if self.master_node['title'] == self.current_node['title']:
+      self._runAsMaster()
     else:
-      _runAsSlave()
+      self._runAsSlave()
 
 
     return
