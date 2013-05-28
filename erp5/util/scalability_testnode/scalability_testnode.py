@@ -437,9 +437,11 @@ branch = %(branch)s
          self.config['working_directory'], self.config, self.log)
 
     # how to use SlapOSControler :
-    # slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
-    # slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
-    #                           'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
+    # slapos_controler._supply(config['slapos_account_slapos_cfg_path'],
+    #                      'kvm.cfg', 'COMP-726')
+    # slapos_controler._request(config['slapos_account_slapos_cfg_path'],
+    #                      'Instance16h34Ben', 'kvm.cfg',
+    #                      'cluster', { "_" : "{'toto' : 'titi'}" } ) 
 
 
     # Install (good) software
@@ -453,9 +455,11 @@ branch = %(branch)s
 
     pass
 
+
   def _runAsSlave(self):
     print "I'm a slave"
     pass
+
 
   def run(self):
     # TODO : change paramters to don't have to put identifiants/url here
@@ -463,22 +467,22 @@ branch = %(branch)s
     erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
 
     self.portal = xmlrpclib.ServerProxy(erp5_url, verbose=False, allow_none=True)
-    # TODO : on sever side (or here if it is possible) create a more beautiful way to get the node list
-    nodes = self.portal.test_node_module.test_node_ben()
- 
+    # TODO : on sever side (or here if it is possible) create
+    # a more beautiful way to get the node list
+    nodes = self.portal.test_node_module.test_node_ben() 
 
     # what if there are no node recorded into ERP5 Master ?
     # what if there are no master testnode ?
     # what if there are several nodes with the same title ?
     # categories test <=> distributor filter
-    self.current_node = [ node for node in nodes if node['title'] == self.config['test_node_title'] ][0]
+    self.current_node = [ node for node in nodes
+               if node['title'] == self.config['test_node_title'] ][0]
     self.master_node = [ node for node in nodes
-                          if ( node['master'] == True ) and
-                          ( node['categories'] == self.current_node['categories'] ) ][0]
+               if ( node['master'] == True )
+               and ( node['categories'] == self.current_node['categories'] ) ][0]
     self.involved_nodes = [ node for node in nodes
-                          if ( node['categories'] == self.current_node['categories'] ) ]
-
-    # 
+               if ( node['categories'] == self.current_node['categories'] ) ]
+    # Master/Slave 
     if self.current_node['title'] == self.master_node['title']:
       self._runAsMaster()
     else:
@@ -487,95 +491,3 @@ branch = %(branch)s
 
     return
 
-
-
-    try:
-      while True:
-        try:
-          node_test_suite = None
-          self.log = self.process_manager.log = self.testnode_log
-          self.cleanUp(None)
-          remote_test_result_needs_cleanup = False
-          begin = time.time()
-          self.prepareSlapOSForTestNode(test_node_slapos)
-          portal_url = config['test_suite_master_url']
-          portal = taskdistribution.TaskDistributionTool(portal_url, logger=DummyLogger(log))
-          test_suite_portal = taskdistribution.TaskDistributor(portal_url, logger=DummyLogger(log))
-          test_suite_json =  test_suite_portal.startTestSuite(config['test_node_title'])
-          test_suite_data = deunicodeData(json.loads(test_suite_json))
-          log("Got following test suite data from master : %r" % \
-              (test_suite_data,))
-          #Clean-up test suites
-          self.checkOldTestSuite(test_suite_data)
-          for test_suite in test_suite_data:
-            remote_test_result_needs_cleanup = False
-            node_test_suite = self.getNodeTestSuite(
-               test_suite["test_suite_reference"])
-            node_test_suite.edit(
-               working_directory=self.config['working_directory'],
-               log_directory=self.config['log_directory'])
-            node_test_suite.edit(**test_suite)
-            run_software = True
-            # Write our own software.cfg to use the local repository
-            self.constructProfile(node_test_suite)
-            # kill processes from previous loop if any
-            self.process_manager.killPreviousRun()
-            self.getAndUpdateFullRevisionList(node_test_suite)
-            # Make sure we have local repository
-            test_result = portal.createTestResult(node_test_suite.revision, [],
-                     config['test_node_title'], False,
-                     node_test_suite.test_suite_title,
-                     node_test_suite.project_title)
-            remote_test_result_needs_cleanup = True
-            log("testnode, test_result : %r" % (test_result, ))
-            if test_result is not None:
-              self.registerSuiteLog(test_result, node_test_suite)
-              self.checkRevision(test_result,node_test_suite)
-              # Now prepare the installation of SlapOS and create instance
-              status_dict = self.prepareSlapOSForTestSuite(node_test_suite)
-              # Give some time so computer partitions may start
-              # as partitions can be of any kind we have and likely will never have
-              # a reliable way to check if they are up or not ...
-              time.sleep(20)
-              self.runTestSuite(node_test_suite,portal_url)
-              # break the loop to get latest priorities from master
-              break
-            self.cleanUp(test_result)
-        except (SubprocessError, CalledProcessError) as e:
-          log("SubprocessError", exc_info=sys.exc_info())
-          if remote_test_result_needs_cleanup:
-            status_dict = e.status_dict or {}
-            test_result.reportFailure(
-              command=status_dict.get('command'),
-              stdout=status_dict.get('stdout'),
-              stderr=status_dict.get('stderr'),
-            )
-          continue
-        except ValueError as e:
-          # This could at least happens if runTestSuite is not found
-          log("ValueError", exc_info=sys.exc_info())
-          if node_test_suite is not None:
-            node_test_suite.retry_software_count += 1
-        except CancellationError, e:
-          log("CancellationError", exc_info=sys.exc_info())
-          self.process_manager.under_cancellation = False
-          node_test_suite.retry = True
-          continue
-        except:
-            log("erp5_scalability_testnode exception", exc_info=sys.exc_info())
-            raise
-        now = time.time()
-        self.cleanUp(test_result)
-        if (now-begin) < 120:
-          sleep_time = 120 - (now-begin)
-          log("End of processing, going to sleep %s" % sleep_time)
-          time.sleep(sleep_time)
-    except:
-      log("Exception in error handling", exc_info=sys.exc_info())
-    finally:
-      # Nice way to kill *everything* generated by run process -- process
-      # groups working only in POSIX compilant systems
-      # Exceptions are swallowed during cleanup phas
-      log("GENERAL EXCEPTION, QUITING")
-      self.cleanUp(test_result)
-      log("GENERAL EXCEPTION, QUITING, cleanup finished")
