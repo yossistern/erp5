@@ -432,6 +432,25 @@ branch = %(branch)s
 
   def _runAsMaster(self):
     print "I'm the master"
+
+    self.slapos_controler = SlapOSControler.SlapOSControler(
+         self.config['working_directory'], self.config, self.log)
+
+    # how to use SlapOSControler :
+    # slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
+    # slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
+    #                           'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
+
+
+    # Install (good) software
+    # 1: Get the soft.cfg into the master working_directory
+    # 2: configure apache to allow acces to it from outside
+    # 3: install software this the ipv6 address made to access to soft.cfg
+    # 4: ok?
+
+    
+
+
     pass
 
   def _runAsSlave(self):
@@ -439,15 +458,6 @@ branch = %(branch)s
     pass
 
   def run(self):
-    print "run"
-    slapos_controler = SlapOSControler.SlapOSControler(
-         self.config['working_directory'], self.config, self.log)
-
-    # how to use SlapOSControler :
-#    slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
-#    slapos_controler._request(config['slapos_account_slapos_cfg_path'], 'Instance16h34Ben',
-#                               'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } ) 
-
     # TODO : change paramters to don't have to put identifiants/url here
     portal_url = self.config['test_suite_master_url']
     erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
@@ -457,7 +467,8 @@ branch = %(branch)s
     nodes = self.portal.test_node_module.test_node_ben()
  
 
-    # what if there are no test_node recorded into ERP5 Master ?
+    # what if there are no node recorded into ERP5 Master ?
+    # what if there are no master testnode ?
     # what if there are several nodes with the same title ?
     # categories test <=> distributor filter
     self.current_node = [ node for node in nodes if node['title'] == self.config['test_node_title'] ][0]
@@ -465,10 +476,10 @@ branch = %(branch)s
                           if ( node['master'] == True ) and
                           ( node['categories'] == self.current_node['categories'] ) ][0]
     self.involved_nodes = [ node for node in nodes
-                          if ( node['categories'] == self.current_node['categories'] ) ][0]
+                          if ( node['categories'] == self.current_node['categories'] ) ]
 
     # 
-    if self.master_node['title'] == self.current_node['title']:
+    if self.current_node['title'] == self.master_node['title']:
       self._runAsMaster()
     else:
       self._runAsSlave()
