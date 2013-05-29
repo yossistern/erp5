@@ -420,18 +420,35 @@ branch = %(branch)s
       # Write our own software.cfg to use the local repository
       self.constructProfile(node_test_suite)
       self.getAndUpdateFullRevisionList(node_test_suite)
+
+      portal_task_distribution_tool = taskdistribution.TaskDistributionTool(
+                                           self.portal_url,
+                                           logger=DummyLogger(self.log))
+#      test_result = self.distributor.createTestResult(
+      test_result = portal_task_distribution_tool.createTestResult(
+                       node_test_suite.revision,
+                       [],
+                       self.config['test_node_title'],
+                       False,
+                       test_suite['test_suite_title'],
+                       node_test_suite.project_title)
+
+
+      print "test_suite['cluster_configuration']:"
+      print test_suite['cluster_configuration']
+      print "test_suite['cluster_constraint']:"
+      print test_suite['cluster_constraint']
+      print "test_suite['number_configuration']:"
+      print test_suite['number_configuration']
+
+
+
+
  
       self.registerSuiteLog(test_result, node_test_suite)
       self.checkRevision(test_result,node_test_suite)
-      # Now prepare the installation of SlapOS and create instance
-      status_dict = self.prepareSlapOSForTestSuite(node_test_suite)
-      # Give some time so computer partitions may start
-      # as partitions can be of any kind we have and likely will never have
-      # a reliable way to check if they are up or not ...
-      time.sleep(20)
-      self.runTestSuite(node_test_suite, self.portal_url)
-
-    print "EndMaster"
+      
+      print "EndMaster"
 
 
   def _runAsSlave(self):
