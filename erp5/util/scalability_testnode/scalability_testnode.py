@@ -84,6 +84,10 @@ def deunicodeData(data):
       key = deunicodeData(key)
       value = deunicodeData(value)
       new_data[key] = value
+  elif isinstance(data, int): 
+    new_data = data
+  else:
+    assert(0, "unknown type")
   return new_data
 
 class NodeTestSuite(SlapOSInstance):
