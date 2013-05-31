@@ -448,11 +448,15 @@ branch = %(branch)s
           self.slapos_controler._supply(self.config['slapos_account_slapos_cfg_path'],
                       url, node['title'])
 
-      # Instance initialisation
+      # Instances initialisation
       number_configuration = int(test_suite['number_configuration'])
-      # TODO : get test_suite name + id or random..., title must be unique!
+
+      # Titles instance must be unique!
+      # TODO : Make them unique
+      title_base = test_suite['project_title']
       instance_title = "xxx"
       instance_title_launcher = "yyy"
+
       # Create instance on the launcher node
       self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
                       instance_title_launcher, "http://git.foo.bar/.../The_Bench_Launcher_Tool.cfg",
@@ -481,12 +485,20 @@ branch = %(branch)s
       self.registerSuiteLog(test_result, node_test_suite)
       self.checkRevision(test_result,node_test_suite)
       
-      print "EndMaster"
-      # cleanUp All traces generated during the masther phase
-      # run()
+      # TODO : ask to slapOS Master to stop instances
+      # TODO : ask to slapOS Master to delete created instance(s)
+      # TODO : ask to slapOS Master to delete softwares
+
+ 
+    print "EndMaster"
+    # Be sure to have finished all test
+    # And next we will go to an other Test
+    # cleanUp All traces generated during the masther phase
+    # run()
 
   def _runAsSlave(self):
     print "I'm a slave"
+    # setPingDate()
     # sleep X seconds
     # run()
     
@@ -535,7 +547,8 @@ branch = %(branch)s
       self._runAsMaster()
     else:
       self._runAsSlave()
-
+    
+    # When is it possible to come here ?
     print "End."
     return
 
