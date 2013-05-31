@@ -79,7 +79,7 @@ def main(*args):
               'ipv4_address','ipv6_address','test_suite_master_url',
               'slapos_account_key', 'slapos_account_certificate',
               'slapgrid_partition_binary','slapgrid_software_binary',
-              'slapproxy_binary', 'httpd_ip', 'httpd_port'):
+              'slapproxy_binary', 'httpd_ip', 'httpd_port', 'httpd_port_suite'):
     CONFIG[key] = config.get('scalability_testnode',key)
 
   for key in ('slapos_directory', 'working_directory', 'test_suite_directory',

@@ -43,6 +43,7 @@ from Updater import Updater
 from erp5.util import taskdistribution
 
 import xmlrpclib
+import jinja2
 
 DEFAULT_SLEEP_TIMEOUT = 120 # time in seconds to sleep
 MAX_LOG_TIME = 15 # time in days we should keep logs that we can see through
@@ -241,7 +242,8 @@ branch = %(branch)s
     custom_profile.write(''.join(profile_content_list))
     custom_profile.close()
 
-    relative_custom_profile_path = os.path.join(self.config['working_directory'], node_test_suite.reference, "rel_software.cfg") 
+    relative_custom_profile_path = os.path.join(self.config['working_directory'],
+                                       node_test_suite.reference, "rel_software.cfg") 
     
     relative_custom_profile = open(relative_custom_profile_path, 'w')
     relative_profile_content_list.sort(key=lambda x: [x, ''][x.startswith('\n[buildout]')])
@@ -249,6 +251,8 @@ branch = %(branch)s
     relative_custom_profile.close()
 
     sys.path.append(repository_path)
+    return os.path.relpath(relative_custom_profile_path, self.config['working_directory'])
+
 
   def getAndUpdateFullRevisionList(self, node_test_suite):
     full_revision_list = []
@@ -334,48 +338,6 @@ branch = %(branch)s
       invocation_list = line[2:].split()
     return invocation_list
 
-  def runTestSuite(self, node_test_suite, portal_url, log=None):
-    config = self.config
-    parameter_list = []
-    run_test_suite_path_list = glob.glob("%s/*/bin/runTestSuite" % \
-        self.slapos_controler.instance_root)
-    if not len(run_test_suite_path_list):
-      raise ValueError('No runTestSuite provided in installed partitions.')
-    run_test_suite_path = run_test_suite_path_list[0]
-    run_test_suite_revision = node_test_suite.revision
-    # Deal with Shebang size limitation
-    invocation_list = self._dealShebang(run_test_suite_path)
-    invocation_list.extend([run_test_suite_path,
-                           '--test_suite', node_test_suite.test_suite,
-                           '--revision', node_test_suite.revision,
-                           '--test_suite_title', node_test_suite.test_suite_title,
-                           '--node_quantity', config['node_quantity'],
-                           '--master_url', portal_url])
-    firefox_bin_list = glob.glob("%s/soft/*/parts/firefox/firefox-slapos" % \
-        config["slapos_directory"])
-    if len(firefox_bin_list):
-      parameter_list.append('--firefox_bin')
-    xvfb_bin_list = glob.glob("%s/soft/*/parts/xserver/bin/Xvfb" % \
-        config["slapos_directory"])
-    if len(xvfb_bin_list):
-      parameter_list.append('--xvfb_bin')
-    supported_paramater_set = self.process_manager.getSupportedParameterSet(
-                           run_test_suite_path, parameter_list)
-    if '--firefox_bin' in supported_paramater_set:
-      invocation_list.extend(["--firefox_bin", firefox_bin_list[0]])
-    if '--xvfb_bin' in supported_paramater_set:
-      invocation_list.extend(["--xvfb_bin", xvfb_bin_list[0]])
-    bt5_path_list = config.get("bt5_path")
-    if bt5_path_list not in ('', None,):
-      invocation_list.extend(["--bt5_path", bt5_path_list])
-    # From this point, test runner becomes responsible for updating test
-    # result. We only do cleanup if the test runner itself is not able
-    # to run.
-    SlapOSControler.createFolder(node_test_suite.test_suite_directory,
-                                 clean=True)
-    self.process_manager.spawn(*invocation_list,
-                          cwd=node_test_suite.test_suite_directory,
-                          log_prefix='runTestSuite', get_output=False)
 
   def _cleanupLog(self):
     config = self.config
@@ -419,52 +381,48 @@ branch = %(branch)s
     self._cleanupLog()
     self._cleanupTemporaryFiles()
 
+  def generateConfiguration(self, cluster_configuration, cluster_constraint, count):
+    # TODO : take into account constraints for comp-attribution
+    template = jinja2.Template(cluster_configuration)
+    nodes = [ node['title'] for node in self.involved_nodes ]
+    templateVars = { "count" : count, "comp" : nodes }
+    return template.render(templateVars)
+    
+
   def _runAsMaster(self):
     print "I'm the master"
 
+    # Slapos controler
     self.slapos_controler = SlapOSControler.SlapOSControler(
          self.config['working_directory'], self.config, self.log)
 
-    # how to use SlapOSControler :
-    # slapos_controler._supply(config['slapos_account_slapos_cfg_path'],
-    #                      'kvm.cfg', 'COMP-726')
-    # slapos_controler._request(config['slapos_account_slapos_cfg_path'],
-    #                      'Instance16h34Ben', 'kvm.cfg',
-    #                      'cluster', { "_" : "{'toto' : 'titi'}" } ) 
-
-
-    # Install (good) software
-    # 1: Get the soft.cfg into the master working_directory
-    # 2: configure apache to allow acces to it (and folder) from outside
-    # 3: install software this the ipv6 address made to access to soft.cfg
-    # 4: ok?
-      
     test_suite_json = self.distributor.startTestSuite(self.config['test_node_title'])
-    print "test_suite_json:"
-    print test_suite_json
     test_suite_data = deunicodeData(json.loads(test_suite_json))
-    print "test_suite_data:"
-    print test_suite_data
     self.checkOldTestSuite(test_suite_data)
+
+    # taskdistribution.TaskDistributionTool instance
+    portal_task_distribution_tool = taskdistribution.TaskDistributionTool(
+                                           self.portal_url,
+                                           logger=DummyLogger(self.log))
+
 
     # Loop on all testsuites asociated to the node
     # (Here we are the master node, but all nodes associated at the
     # same distributor should have same testsuites.)
     for test_suite in test_suite_data:
-      print "test_suite:"
-      print test_suite
+      #
       node_test_suite = self.getNodeTestSuite(test_suite["test_suite_reference"])
       node_test_suite.edit(
            working_directory=self.config['working_directory'],
            log_directory=self.config['log_directory'])
       node_test_suite.edit(**test_suite)
-      # Write our own software.cfg to use the local repository
-      self.constructProfile(node_test_suite)
-      self.getAndUpdateFullRevisionList(node_test_suite)
 
-      portal_task_distribution_tool = taskdistribution.TaskDistributionTool(
-                                           self.portal_url,
-                                           logger=DummyLogger(self.log))
+      # Write current software.cfg
+      self.relative_software_url = self.constructProfile(node_test_suite)
+
+      self.getAndUpdateFullRevisionList(node_test_suite)
+      
+      # Create a test tesult for this test
       test_result = portal_task_distribution_tool.createTestResult(
                        node_test_suite.revision,
                        [],
@@ -473,21 +431,64 @@ branch = %(branch)s
                        test_suite['test_suite_title'],
                        node_test_suite.project_title)
 
+      # The ipv6 software url of the current test suite,
+      # accessible from outside.
+      software_url = ("https://[%s]:%s/%s") %(str(self.config['httpd_ip']),
+                                              str(self.config['httpd_port_suite']),
+                                              str(self.relative_software_url))
+      # Softwares to install on each involved nodes
+      software_url_list = []
+      software_url_list.append(software_url)
+      #software_url_list.append("http://git.foo.bar/.../The_Bench_Launcher_Tool.cfg")
 
-      print test_suite['cluster_configuration']
-      print test_suite['cluster_constraint']
-      print test_suite['number_configuration']
 
+      # Install software(s) on each involved node
+      for node in self.involved_nodes:
+        for url in software_url_list:
+          self.slapos_controler._supply(self.config['slapos_account_slapos_cfg_path'],
+                      url, node['title'])
 
+      # Instance initialisation
+      number_configuration = int(test_suite['number_configuration'])
+      # TODO : get test_suite name + id or random..., title must be unique!
+      instance_title = "xxx"
+      instance_title_launcher = "yyy"
+      # Create instance on the launcher node
+      self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
+                      instance_title_launcher, "http://git.foo.bar/.../The_Bench_Launcher_Tool.cfg",
+                      'cluster', { "_" : "x,y,z" } )
+
+      # For each configuration
+      for count in range(number_configuration+1):
+        current_configuration = self.generateConfiguration(
+                                    test_suite['cluster_configuration'],
+                                    test_suite['cluster_constraint'],
+                                    count)
+        if count == 1:
+          # First time create the instance
+          self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
+                      instance_title, software_url,
+                      'cluster', { "_" : current_configuration } )
+        else:
+          # Others times just update the instance configuration
+          self.slapos_controler._updateInstanceConfiguration(
+                            self.config['slapos_account_slapos_cfg_path'],
+                            instance_title, software_url,
+                           'cluster', { "_" : current_configuration } )
+        # TODO : Do something with result line to notify indirectly the launcher
+        # that everything is ready.          
  
       self.registerSuiteLog(test_result, node_test_suite)
       self.checkRevision(test_result,node_test_suite)
       
       print "EndMaster"
-
+      # cleanUp All traces generated during the masther phase
+      # run()
 
   def _runAsSlave(self):
     print "I'm a slave"
+    # sleep X seconds
+    # run()
     
 
   def run(self):
@@ -508,7 +509,7 @@ branch = %(branch)s
     self.distributor.optimizeConfiguration()
    
   
-    # TODO : (Put the code below into a loop)
+ 
 
     # Determine master and do job
 

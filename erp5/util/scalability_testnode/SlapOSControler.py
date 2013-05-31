@@ -79,6 +79,8 @@ class SlapOSControler(object):
     Ex :
     slapos_controler._supply(config['slapos_account_slapos_cfg_path'], 'kvm.cfg', 'COMP-726')
     """
+    # TODO : remove return
+    return
     self.log('SlapOSControler : _supply')
     parser = argparse.ArgumentParser()
     parser.add_argument("configuration_file")
@@ -105,6 +107,8 @@ class SlapOSControler(object):
                                'kvm.cfg', 'cluster', { "_" : "{'toto' : 'titi'}" } )
 
     """
+    # TODO : remove return
+    return
     self.log('SlapOSControler : _request')
     parser = argparse.ArgumentParser()
     parser.add_argument("configuration_file")
@@ -118,6 +122,15 @@ class SlapOSControler(object):
         software_type = software_type)
     #      print "Instance requested.\nState is : %s." % partition.getState()
     # Is it possible to have the true state of the instance with getState() ?
+
+  def _updateInstanceConfiguration(self, configuration_file_path, reference,
+          software_url, software_type, software_configuration):
+    """
+    _updateInstanceConfiguration doc
+    """
+    # TODO : write code
+    pass
+    
 
   def _resetSoftware(self):
     self.log('SlapOSControler : GOING TO RESET ALL SOFTWARE : %r' % (self.software_root,))
