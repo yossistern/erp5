@@ -87,7 +87,7 @@ def deunicodeData(data):
   elif isinstance(data, int): 
     new_data = data
   else:
-    assert(0, "unknown type")
+    raise ValueError(PROFILE_PATH_KEY + ' not defined')  
   return new_data
 
 class NodeTestSuite(SlapOSInstance):
@@ -162,14 +162,10 @@ class TestNode(object):
        os.remove(fpath)
 
   def getNodeTestSuite(self, reference):
-    print "getNodeTestSuite"
     node_test_suite = self.node_test_suite_dict.get(reference)
     if node_test_suite is None:
-      print "node_test_suite is None"
       node_test_suite = NodeTestSuite(reference)
-      self.node_test_suite_dict[reference] = node_test_suite
-    print "return:"
-    print node_test_suite
+      self.node_test_suite_dict[reference] = node_test_suite 
     return node_test_suite
 
   def delNodeTestSuite(self, reference):
@@ -182,6 +178,7 @@ class TestNode(object):
     assert len(node_test_suite.vcs_repository_list), "we must have at least one repository"
     profile_path_count = 0
     profile_content_list = []
+    relative_profile_content_list = []
     for vcs_repository in node_test_suite.vcs_repository_list:
       url = vcs_repository['url']
       buildout_section_id = vcs_repository.get('buildout_section_id', None)
@@ -194,10 +191,25 @@ class TestNode(object):
         profile_path_count += 1
         if profile_path_count > 1:
           raise ValueError(PROFILE_PATH_KEY + ' defined more than once')
+
+        # Absolute path to relative path
+
+        from_path = os.path.join(self.config['working_directory'], node_test_suite.reference)
+        relative_software_config_path = os.path.join(repository_path, profile_path)
+        relative_software_config_path = os.path.relpath(relative_software_config_path,
+                                                         from_path)
+
         profile_content_list.append("""
 [buildout]
 extends = %(software_config_path)s
 """ %  {'software_config_path': os.path.join(repository_path, profile_path)})
+# rel_        
+        relative_profile_content_list.append("""
+[buildout]
+extends = %(software_config_path)s
+""" %  {'software_config_path': relative_software_config_path})
+
+
 
       if not(buildout_section_id is None):
         profile_content_list.append("""
@@ -207,13 +219,35 @@ branch = %(branch)s
 """ %  {'buildout_section_id': buildout_section_id,
    'repository_path' : repository_path,
    'branch' : vcs_repository.get('branch','master')})
+# _rel
+      if not(buildout_section_id is None):
+        relative_profile_content_list.append("""
+[%(buildout_section_id)s]
+repository = %(repository_path)s
+branch = %(branch)s
+""" %  {'buildout_section_id': buildout_section_id,
+   'repository_path' : os.path.relpath(repository_path,
+                                        from_path),
+   'branch' : vcs_repository.get('branch','master')})
+
+
+
     if not profile_path_count:
       raise ValueError(PROFILE_PATH_KEY + ' not defined')
+
     custom_profile = open(node_test_suite.custom_profile_path, 'w')
     # sort to have buildout section first
     profile_content_list.sort(key=lambda x: [x, ''][x.startswith('\n[buildout]')])
     custom_profile.write(''.join(profile_content_list))
     custom_profile.close()
+
+    relative_custom_profile_path = os.path.join(self.config['working_directory'], node_test_suite.reference, "rel_software.cfg") 
+    
+    relative_custom_profile = open(relative_custom_profile_path, 'w')
+    relative_profile_content_list.sort(key=lambda x: [x, ''][x.startswith('\n[buildout]')])
+    relative_custom_profile.write(''.join(relative_profile_content_list))
+    relative_custom_profile.close()
+
     sys.path.append(repository_path)
 
   def getAndUpdateFullRevisionList(self, node_test_suite):
@@ -401,7 +435,7 @@ branch = %(branch)s
 
     # Install (good) software
     # 1: Get the soft.cfg into the master working_directory
-    # 2: configure apache to allow acces to it from outside
+    # 2: configure apache to allow acces to it (and folder) from outside
     # 3: install software this the ipv6 address made to access to soft.cfg
     # 4: ok?
       
@@ -413,6 +447,9 @@ branch = %(branch)s
     print test_suite_data
     self.checkOldTestSuite(test_suite_data)
 
+    # Loop on all testsuites asociated to the node
+    # (Here we are the master node, but all nodes associated at the
+    # same distributor should have same testsuites.)
     for test_suite in test_suite_data:
       print "test_suite:"
       print test_suite
@@ -428,7 +465,6 @@ branch = %(branch)s
       portal_task_distribution_tool = taskdistribution.TaskDistributionTool(
                                            self.portal_url,
                                            logger=DummyLogger(self.log))
-#      test_result = self.distributor.createTestResult(
       test_result = portal_task_distribution_tool.createTestResult(
                        node_test_suite.revision,
                        [],
@@ -438,14 +474,9 @@ branch = %(branch)s
                        node_test_suite.project_title)
 
 
-      print "test_suite['cluster_configuration']:"
       print test_suite['cluster_configuration']
-      print "test_suite['cluster_constraint']:"
       print test_suite['cluster_constraint']
-      print "test_suite['number_configuration']:"
       print test_suite['number_configuration']
-
-
 
 
  
