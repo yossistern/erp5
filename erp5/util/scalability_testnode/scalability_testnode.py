@@ -381,20 +381,20 @@ branch = %(branch)s
     self._cleanupLog()
     self._cleanupTemporaryFiles()
 
-  def generateConfiguration(self, cluster_configuration, cluster_constraint, count):
+  def selectLauncher(self, cluster_configuration, cluster_constraint):
+    # TODO : take into account constraints for comp-attribution
+    return self.involved_nodes[0]['title'] 
+
+  def generateConfiguration(self, cluster_configuration, cluster_constraint, count, launcher_node_title):
     # TODO : take into account constraints for comp-attribution
     template = jinja2.Template(cluster_configuration)
-    nodes = [ node['title'] for node in self.involved_nodes ]
+    # Select nodes wich are involved and are not selected to be launcher
+    nodes = [ node['title'] for node in self.involved_nodes if node['title'] not in launcher_node_title ]
     templateVars = { "count" : count, "comp" : nodes }
-    return template.render(templateVars)
-    
+    return template.render(templateVars) 
 
   def _runAsMaster(self):
     print "I'm the master"
-
-    # Slapos controler
-    self.slapos_controler = SlapOSControler.SlapOSControler(
-         self.config['working_directory'], self.config, self.log)
 
     test_suite_json = self.distributor.startTestSuite(self.config['test_node_title'])
     test_suite_data = deunicodeData(json.loads(test_suite_json))
@@ -410,7 +410,13 @@ branch = %(branch)s
     # (Here we are the master node, but all nodes associated at the
     # same distributor should have same testsuites.)
     for test_suite in test_suite_data:
-      #
+
+      # TODO : Update here the involved node list (what if
+      #          a node is invalidated here..) 
+      # TODO : check if the number of nodes requested (cluster+launcher) is available
+      #        if the number of available nodes is not sufficient go to the next     
+      #        test_suite.
+
       node_test_suite = self.getNodeTestSuite(test_suite["test_suite_reference"])
       node_test_suite.edit(
            working_directory=self.config['working_directory'],
@@ -451,23 +457,49 @@ branch = %(branch)s
       # Instances initialisation
       number_configuration = int(test_suite['number_configuration'])
 
-      # Titles instance must be unique!
-      # TODO : Make them unique
-      title_base = test_suite['project_title']
-      instance_title = "xxx"
-      instance_title_launcher = "yyy"
+      # Instance's titles must be unique! 
+      title_base = "%s_%s_%s_%s" %(
+                                   test_suite['project_title'],
+                                   test_suite['test_suite_title'],
+                                   test_suite['test_suite_reference'],
+                                   str(time.time()),
+                                 )
+      instance_title = "ScalabilityAutoTest_Cluster_%s" %(title_base)
+      instance_title_launcher = "ScalabilityAutoTest_Launcher_%s" %(title_base)
 
-      # Create instance on the launcher node
-      self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
-                      instance_title_launcher, "http://git.foo.bar/.../The_Bench_Launcher_Tool.cfg",
-                      'cluster', { "_" : "x,y,z" } )
+      # Select node to launch benchmark and create Launcher-instance
+      launcher_node_title = self.selectLauncher(
+                                    test_suite['cluster_configuration'],
+                                    test_suite['cluster_constraint'])
+      # Probably not the best way to have multi-Launcher
+      # TODO : improve this part
+      for title in launcher_node_title:
+        instance_title_launcher = "ScalabilityAutoTest_Launcher_%s_%s" %(title, title_base)
+        self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
+                                    instance_title_launcher,
+                                   "http://git.foo.bar/.../The_Bench_Launcher_Tool.cfg",
+                                   'cluster', { "_" : "x,y,z" },
+                                    computer_guid=title, )
 
       # For each configuration
       for count in range(number_configuration+1):
+
         current_configuration = self.generateConfiguration(
                                     test_suite['cluster_configuration'],
                                     test_suite['cluster_constraint'],
-                                    count)
+                                    count,
+                                    launcher_node_title)
+
+
+        print "launcher_node_title:"
+        print launcher_node_title
+        print "current_configuration:"
+        print current_configuration
+        time.sleep(5)
+
+
+
+
         if count == 1:
           # First time create the instance
           self.slapos_controler._request(self.config['slapos_account_slapos_cfg_path'],
@@ -489,10 +521,12 @@ branch = %(branch)s
       # TODO : ask to slapOS Master to delete created instance(s)
       # TODO : ask to slapOS Master to delete softwares
 
- 
+
+    # End of all the scalability test 
     print "EndMaster"
     # Be sure to have finished all test
     # And next we will go to an other Test
+    # CleanUp /srv/scalability_testnode/
     # cleanUp All traces generated during the masther phase
     # run()
 
@@ -505,6 +539,15 @@ branch = %(branch)s
 
   def run(self):
 
+    print self.config['computer_id']
+
+    # Slapos controler
+    self.slapos_controler = SlapOSControler.SlapOSControler(
+    self.config['working_directory'], self.config, self.log)
+
+#    self.config['computer_id'] = self.slapos_controler.getComputerId()
+#    print self.slapos_controler.getComputerId(
+
     # Get portal
     self.erp5_url = "https://zope:insecure@192.168.242.70:1234/erp5"
     self.portal = xmlrpclib.ServerProxy(self.erp5_url, verbose=False, allow_none=True) 
@@ -514,8 +557,11 @@ branch = %(branch)s
                              self.config['test_suite_master_url'],
                              verbose=False, allow_none=True)
 
+#    print self.distributor.getInvolvedNodeList()
+#    return
+
     # Node subscription
-    self.distributor.nodeSubscription(self.config['test_node_title'])
+    self.distributor.subscribeNode(self.config['test_node_title'])
 
     # OptimizeConfiguration (select master + aggregate test_suite)
     self.distributor.optimizeConfiguration()
@@ -528,8 +574,15 @@ branch = %(branch)s
     # TODO : on sever side (or here if it is possible) create
     # a more beautiful way to get the node list
     # This command return empty list sometimes, why ?
-    nodes = self.portal.test_node_module.test_node_ben() 
+    nodes = self.distributor.getInvolvedNodeList()
+    print "zZz"
+    print nodes
+    print "xXx"
+    return
 
+    nodes = self.portal.test_node_module.test_node_ben() 
+    print nodes
+    return
     # what if there are no node recorded into ERP5 Master ?
     # what if there are no master testnode ?
     # what if there are several nodes with the same title ?

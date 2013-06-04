@@ -94,7 +94,7 @@ class SlapOSControler(object):
       raise ValueError("Configuration file not found.")
 
   def _request(self, configuration_file_path, reference,
-          software_url, software_type, software_configuration):
+          software_url, software_type, software_configuration, computer_guid=None):
     """
     configuration_file_path (slapos acount)
     reference : instance name
@@ -110,6 +110,11 @@ class SlapOSControler(object):
     # TODO : remove return
     return
     self.log('SlapOSControler : _request')
+
+    filter_kw = None
+    if computer_guid != None:
+      filter_kw = { "computer_guid": computer_guid }
+
     parser = argparse.ArgumentParser()
     parser.add_argument("configuration_file")
     args = parser.parse_args([configuration_file_path])
@@ -119,7 +124,8 @@ class SlapOSControler(object):
         software_release = software_url,
         partition_reference = reference,
         partition_parameter_kw = software_configuration,
-        software_type = software_type)
+        software_type = software_type,
+        filter_kw = filter_kw)
     #      print "Instance requested.\nState is : %s." % partition.getState()
     # Is it possible to have the true state of the instance with getState() ?
 

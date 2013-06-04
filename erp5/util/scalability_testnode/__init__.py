@@ -70,6 +70,17 @@ def main(*args):
     logger.addHandler(logging.NullHandler())
   CONFIG['logger'] = logger.info
   config = ConfigParser.SafeConfigParser()
+  """  
+  # /slappart42/buildout.cfg ( ? ) 
+  config.readfp( ... )
+  CONFIG['computer_id'] = config.get('slap-connection', 'computer_id')
+  CONFIG['master_url'] = config.get('slap-connection', 'master_url')
+  print "computer_id:"
+  print CONFIG['computer-id']
+  print "master-url:"
+  print CONFIG['master-url']
+  """
+
   # do not change case of option keys
   config.optionxform = str
   config.readfp(parsed_argument.configuration_file[0])
