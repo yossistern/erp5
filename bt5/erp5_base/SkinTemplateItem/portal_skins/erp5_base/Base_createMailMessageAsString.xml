@@ -55,11 +55,12 @@
 else:\n
   mail_template = context.Event_viewMimeMessage\n
 \n
+embedded_attachment_list = []\n
 for embedded_file in embedded_file_list:\n
   mime_type, content = embedded_file.getMimeTypeAndContent()\n
   name = embedded_file.getFilename()\n
 \n
-  attachment_list.append({\'mime_type\':mime_type,\n
+  embedded_attachment_list.append({\'mime_type\':mime_type,\n
                           \'content\':content,\n
                           \'name\':name})\n
 \n
@@ -72,7 +73,7 @@ multipart = mail_template.as_message(mfrom=from_url,\n
                                      subject=subject,\n
                                      body=body,\n
                                      encoding=\'utf-8\')\n
-for attachment_dict in attachment_list:\n
+for attachment_dict in (attachment_list + embedded_attachment_list):\n
   multipart.add_file(data=attachment_dict[\'content\'],\n
                      content_type=attachment_dict[\'mime_type\'],\n
                      filename=attachment_dict[\'name\'])\n
